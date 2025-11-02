@@ -1,0 +1,22 @@
+# Linux y Windows básicos
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Archivos de editores
+.vscode/
+*.code-workspace
+
+# Backups de scripts
+*.sh~
+*.ps1~
+
+# Archivos de VM (VirtualBox)
+*.vbox
+*.vdi
+*.vmdk
+*.nvram
+*.sav
+*.log
