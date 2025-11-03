@@ -29,7 +29,7 @@ network:
       gateway4: 192.168.0.1
       nameservers:
         addresses: [8.8.8.8, 8.8.4.4]
-        ```
+```
 
 
 Set correct permissions:
