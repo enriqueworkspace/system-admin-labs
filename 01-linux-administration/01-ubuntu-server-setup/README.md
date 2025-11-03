@@ -11,12 +11,12 @@ Steps:
 
 Edit the Netplan configuration file:
 
-sudo nano /etc/netplan/00-installer-config.yaml
+```sudo nano /etc/netplan/00-installer-config.yaml```
 
 
 Configuration used:
 
-network:
+```network:
   version: 2
   renderer: networkd
   ethernets:
@@ -26,40 +26,41 @@ network:
       gateway4: 192.168.0.1
       nameservers:
         addresses: [8.8.8.8, 8.8.4.4]
+        ```
 
 
 Set correct permissions:
 
-sudo chmod 600 /etc/netplan/00-installer-config.yaml
+```sudo chmod 600 /etc/netplan/00-installer-config.yaml```
 
 
 Apply the configuration:
 
-sudo netplan apply
+```sudo netplan apply```
 
 
 Verify the IP:
 
-ip a show enp0s3
+```ip a show enp0s3```
 
 
 Problem encountered: A secondary dynamic IP (192.168.0.120) appeared due to Cloud-init.
 
 Solution: Rename the Cloud-init Netplan file and reapply:
 
-sudo mv /etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml.bak
-sudo netplan apply
+```sudo mv /etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml.bak
+sudo netplan apply```
 
 
 Verify that only the static IP remains:
 
-ip a show enp0s3
+```ip a show enp0s3```
 
 
 Test connectivity:
 
-ping 192.168.0.1
-ping -c 3 google.com
+```ping 192.168.0.1
+ping -c 3 google.com```
 
 2️⃣ Hostname Configuration
 
@@ -67,29 +68,29 @@ Purpose: Set a proper server hostname for identification in the network and for 
 
 Check current hostname:
 
-hostnamectl
+```hostnamectl```
 
 
 Change the hostname:
 
-sudo hostnamectl set-hostname ubuntu-labtest
+```sudo hostnamectl set-hostname ubuntu-labtest```
 
 
 Update /etc/hosts to avoid issues with local services:
 
-sudo nano /etc/hosts
+```sudo nano /etc/hosts```
 
 
 Add the following:
 
-127.0.0.1   localhost
-127.0.1.1   ubuntu-labtest
+```127.0.0.1   localhost
+127.0.1.1   ubuntu-labtest```
 
 
 Verify:
 
-hostname
-hostnamectl
+```hostname
+hostnamectl```
 
 3️⃣ DNS Configuration
 
@@ -97,14 +98,14 @@ Purpose: Ensure proper name resolution for external domains.
 
 Already configured in Netplan during static IP setup:
 
-nameservers:
-  addresses: [8.8.8.8, 8.8.4.4]
+```nameservers:
+  addresses: [8.8.8.8, 8.8.4.4]```
 
 
 Verify DNS resolution:
 
-ping google.com
-systemd-resolve --status
+```ping google.com
+systemd-resolve --status```
 
 4️⃣ SSH Configuration
 
@@ -112,31 +113,31 @@ Purpose: Enable remote administration of the server.
 
 Install OpenSSH server:
 
-sudo apt update
-sudo apt install openssh-server -y
+```sudo apt update
+sudo apt install openssh-server -y```
 
 
 Start and verify SSH:
 
-sudo systemctl start ssh
-sudo systemctl status ssh
+```sudo systemctl start ssh
+sudo systemctl status ssh```
 
 
 Enable SSH to start on boot:
 
-sudo systemctl enable ssh
+```sudo systemctl enable ssh```
 
 
 Verify listening port:
 
-sudo ss -tuln | grep 22
+```sudo ss -tuln | grep 22```
 
 
 Output shows SSH listening on all IPv4 and IPv6 interfaces.
 
 Test connection from another machine:
 
-ssh rooty@192.168.0.150
+```ssh rooty@192.168.0.150```
 
 
 Accept the host key (yes) and enter the password.
