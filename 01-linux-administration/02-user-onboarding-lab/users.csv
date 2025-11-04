@@ -1,0 +1,4 @@
+# username,full_name,primary_group,secondary_groups
+jdoe,John Doe,development,"vpn_users,git_access"
+asmith,Alice Smith,sales,"crm_users,report_access"
+rbrown,Robert Brown,management,"report_access,ssh_access"
