@@ -1,0 +1,1 @@
+# Lab 01: This lab will demonstrate the installation and configuration of a Windows Server as a domain controller, the creation of OUs, users, and groups, and the verification of Active Directory functionality.
