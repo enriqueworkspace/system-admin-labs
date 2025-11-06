@@ -141,7 +141,7 @@ The Installed column should show True.
 ```
 # Check AD-related features
 
-Get-WindowsFeature | Where-Object {$\_.Name -like "\*AD\*"}
+Get-WindowsFeature | Where-Object {$_.Name -like "*AD*"}
 ```
 
 Lists all installed AD features.
@@ -241,17 +241,17 @@ Step 5: Verify the Configuration
 ```
 # View all OUs
 
-Get-ADOrganizationalUnit -Filter \*
+Get-ADOrganizationalUnit -Filter *
 
 
 # View users in IT OU
 
-Get-ADUser -Filter \* -SearchBase "OU=IT,DC=corp,DC=local"
+Get-ADUser -Filter * -SearchBase "OU=IT,DC=corp,DC=local"
 
 
 # View users in HR OU
 
-Get-ADUser -Filter \* -SearchBase "OU=HR,DC=corp,DC=local"
+Get-ADUser -Filter * -SearchBase "OU=HR,DC=corp,DC=local"
 
 
 # View group members
