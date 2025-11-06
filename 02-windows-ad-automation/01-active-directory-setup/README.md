@@ -5,9 +5,14 @@ Overview
 This lab demonstrates the installation and configuration of a Windows Server as an Active Directory Domain Controller (DC). It covers:
 
 *Installing the Active Directory Domain Services (AD DS) role.
+
+
 *Promoting the server to a DC and creating a new domain.
+
 *Creating Organizational Units (OUs), users, and groups.
+
 *Verifying AD functionality and connectivity.
+
 *All tasks in this lab were performed entirely using PowerShell, without using GUI tools.
 
 ---
@@ -119,6 +124,8 @@ Get-DnsClientServerAddress -InterfaceAlias "Ethernet"
 Test-Connection 8.8.8.8
 ```
 
+---
+
 Step 2: Install the Active Directory Domain Services (AD DS) Role
 
 ```
@@ -165,6 +172,7 @@ Get-Service -Name ntds
 
 Expected to show Stopped before promotion to DC.
 
+---
 
 Step 3: Promote the Server to a Domain Controller
 
@@ -198,6 +206,7 @@ Force: executes without interactive prompts.
 
 After executing this command, the server automatically restarts and becomes the first domain controller of corp.local.
 
+---
 
 Step 4: Create Organizational Units (OUs), Groups, and Users
 
@@ -245,6 +254,7 @@ Add-ADGroupMember -Identity "HR-Staff" -Members "mjones"
 ```
 Assigns users to their respective groups.
 
+---
 
 Step 5: Verify the Configuration
 
