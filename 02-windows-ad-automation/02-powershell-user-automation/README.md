@@ -234,10 +234,6 @@ Run the script:
 
 
 
-Check the log file for details: C:\\AD\_Automation\\UserCreation.log.
-
-
-
 Verification
 
 
