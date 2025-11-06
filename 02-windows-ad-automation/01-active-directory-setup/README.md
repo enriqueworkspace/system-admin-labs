@@ -86,8 +86,11 @@ Shows all network interfaces and their names. Needed to configure the static IP.
 New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 192.168.0.121 -PrefixLength 24 -DefaultGateway 192.168.1.1
 ```
 InterfaceAlias: the network adapter name.
+
 IPAddress: static IP of the server.
+
 PrefixLength 24: subnet mask 255.255.255.0.
+
 DefaultGateway: network gateway.
 
 ```
@@ -180,12 +183,19 @@ Install-ADDSForest `
 -Force
 ```
 Explanation of Parameters
+
 DomainName: full domain name to create.
+
 DomainNetbiosName: short name of the domain.
+
 InstallDns: installs a DNS server on the DC.
+
 CreateDnsDelegation:$false: do not create an external DNS delegation.
+
 SafeModeAdministratorPassword: password for Directory Services Restore Mode (DSRM).
+
 Force: executes without interactive prompts.
+
 After executing this command, the server automatically restarts and becomes the first domain controller of corp.local.
 
 
