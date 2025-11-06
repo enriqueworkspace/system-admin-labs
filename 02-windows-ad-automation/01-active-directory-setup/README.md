@@ -282,3 +282,6 @@ Get-ADGroupMember -Identity "HR-Staff"
 ```
 Confirms that OUs, users, and groups were correctly created and assigned.
 
+![OUs,User,Group](screenshots/domain_ou_group_users.png)
+
+![OUs,User,Group](screenshots/group_member.png)
