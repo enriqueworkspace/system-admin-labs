@@ -286,6 +286,6 @@ Only the Automation OU is affected, leaving previous lab objects intact.
 
 All actions are logged for auditing and troubleshooting purposes.
 
-![OU_creation](OU_creation.png)
+![OU Creation](screenshots/OU_creation.png)
 
-![Automation OU](OU_and_Users.png)
+![Automation OU](screenshots/OU_and_Users.png)
