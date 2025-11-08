@@ -128,7 +128,7 @@ Step 3: Link GPOs to OUs
 
 ```
 
-\# Link BlockControlPanel GPO to multiple OUs
+# Link BlockControlPanel GPO to multiple OUs
 
 $ous = @(
 
@@ -148,7 +148,7 @@ foreach ($ou in $ous) {
 
 
 
-\# Link DriveMapping GPO
+# Link DriveMapping GPO
 
 New-GPLink -Name "GPO-DriveMapping" -Target "OU=IT,DC=corp,DC=local"
 
@@ -156,13 +156,13 @@ New-GPLink -Name "GPO-DriveMapping" -Target "OU=HR,DC=corp,DC=local"
 
 
 
-\# Link WallpaperSecurity GPO
+# Link WallpaperSecurity GPO
 
 New-GPLink -Name "GPO-WallpaperSecurity" -Target "OU=Automation,DC=corp,DC=local"
 
 
 
-\# Verify linked GPOs
+# Verify linked GPOs
 
 Get-GPInheritance -Target "OU=IT,DC=corp,DC=local" | Select-Object GpoName, Enforced
 
@@ -240,7 +240,7 @@ Optional PowerShell:
 
 ```
 
-Set-GPRegistryValue -Name "GPO-BlockControlPanel" -Key "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer" -ValueName "NoControlPanel" -Type DWord -Value 1
+Set-GPRegistryValue -Name "GPO-BlockControlPanel" -Key "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" -ValueName "NoControlPanel" -Type DWord -Value 1
 
 ```
 
@@ -264,19 +264,19 @@ Step 5: Force GPO Update and Verify
 
 ```
 
-\# Force immediate refresh
+# Force immediate refresh
 
 gpupdate /force
 
 
 
-\# Check applied GPOs for user
+# Check applied GPOs for user
 
 gpresult /r
 
 
 
-\# Verify linked GPOs for OU
+# Verify linked GPOs for OU
 
 Get-GPInheritance -Target "OU=IT,DC=corp,DC=local"
 
