@@ -218,7 +218,7 @@ Navigate to the folder:
 
 ```
 
-cd "C:\\Path\\To\\Script"
+cd "C:\Path\To\Script"
 
 ```
 
@@ -228,7 +228,7 @@ Run the script:
 
 ```
 
-.\\Create-ADUsers.ps1
+.\Create-ADUsers.ps1
 
 ```
 
@@ -246,7 +246,7 @@ List users in Automation OU:
 
 ```
 
-Get-ADUser -Filter \* -SearchBase "OU=Automation,DC=corp,DC=local" | Select-Object SamAccountName, GivenName, Surname
+Get-ADUser -Filter * -SearchBase "OU=Automation,DC=corp,DC=local" | Select-Object SamAccountName, GivenName, Surname
 
 ```
 
