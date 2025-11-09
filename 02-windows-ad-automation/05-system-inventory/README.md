@@ -34,70 +34,38 @@ I defined a list of computers in a variable $computers. By default, it contains 
 
 ```
 
-\# Get-HardwareInfo.ps1
+# Get-HardwareInfo.ps1
+# Collect hardware information and save to CSV
 
-\# Collect hardware information and save to CSV
-
-
-
-$inventoryFolder = "C:\\SystemInventory"
-
+$inventoryFolder = "C:\SystemInventory"
 $csvPath = Join-Path $inventoryFolder "HardwareReport.csv"
 
-
-
-\# Create CSV with header if it doesn't exist
-
+# Create CSV with header if it doesn't exist
 if (-not (Test-Path $csvPath)) {
-
-&nbsp;   "Name,Manufacturer,Model,TotalPhysicalMemory,ProcessorName,Cores,LogicalProcessors" | Out-File -FilePath $csvPath
-
+    "Name,Manufacturer,Model,TotalPhysicalMemory,ProcessorName,Cores,LogicalProcessors" | Out-File -FilePath $csvPath
 }
 
-
-
-\# List of computers
-
+# List of computers
 $computers = @('localhost')
 
-
-
 foreach ($computer in $computers) {
+    Write-Host "Collecting hardware info for $computer" -ForegroundColor Cyan
 
-&nbsp;   Write-Host "Collecting hardware info for $computer" -ForegroundColor Cyan
+    $sys = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $computer
+    $cpu = Get-WmiObject -Class Win32_Processor -ComputerName $computer
 
+    # Build object to export
+    $obj = [PSCustomObject]@{
+        Name = $sys.Name
+        Manufacturer = $sys.Manufacturer
+        Model = $sys.Model
+        TotalPhysicalMemory = $sys.TotalPhysicalMemory
+        ProcessorName = $cpu.Name
+        Cores = $cpu.NumberOfCores
+        LogicalProcessors = $cpu.NumberOfLogicalProcessors
+    }
 
-
-&nbsp;   $sys = Get-WmiObject -Class Win32\_ComputerSystem -ComputerName $computer
-
-&nbsp;   $cpu = Get-WmiObject -Class Win32\_Processor -ComputerName $computer
-
-
-
-&nbsp;   # Build object to export
-
-&nbsp;   $obj = \[PSCustomObject]@{
-
-&nbsp;       Name = $sys.Name
-
-&nbsp;       Manufacturer = $sys.Manufacturer
-
-&nbsp;       Model = $sys.Model
-
-&nbsp;       TotalPhysicalMemory = $sys.TotalPhysicalMemory
-
-&nbsp;       ProcessorName = $cpu.Name
-
-&nbsp;       Cores = $cpu.NumberOfCores
-
-&nbsp;       LogicalProcessors = $cpu.NumberOfLogicalProcessors
-
-&nbsp;   }
-
-
-
-&nbsp;   $obj | Export-Csv -Path $csvPath -NoTypeInformation -Append
-
+    $obj | Export-Csv -Path $csvPath -NoTypeInformation -Append
 }
 
 ```
@@ -131,57 +99,31 @@ Software Information Script (Get-SoftwareInfo.ps1)
 The software script collects all installed applications and stores them in a CSV.
 
 ```
+# Get-SoftwareInfo.ps1
+# Collect installed software and save to CSV
 
-\# Get-SoftwareInfo.ps1
-
-\# Collect installed software and save to CSV
-
-
-
-$inventoryFolder = "C:\\SystemInventory"
-
+$inventoryFolder = "C:\SystemInventory"
 $csvPath = Join-Path $inventoryFolder "SoftwareReport.csv"
 
-
-
-\# Create CSV with header if it doesn't exist
-
+# Create CSV with header if it doesn't exist
 if (-not (Test-Path $csvPath)) {
-
-&nbsp;   "ComputerName,Name,Version,Vendor" | Out-File -FilePath $csvPath
-
+    "ComputerName,Name,Version,Vendor" | Out-File -FilePath $csvPath
 }
 
-
-
-\# List of computers
-
+# List of computers
 $computers = @('localhost')
 
-
-
 foreach ($computer in $computers) {
+    Write-Host "Collecting software info for $computer" -ForegroundColor Cyan
 
-&nbsp;   Write-Host "Collecting software info for $computer" -ForegroundColor Cyan
-
-
-
-&nbsp;   Get-CimInstance -ClassName Win32\_Product -ComputerName $computer | ForEach-Object {
-
-&nbsp;       \[PSCustomObject]@{
-
-&nbsp;           ComputerName = $computer
-
-&nbsp;           Name = $\_.Name
-
-&nbsp;           Version = $\_.Version
-
-&nbsp;           Vendor = $\_.Vendor
-
-&nbsp;       } | Export-Csv -Path $csvPath -NoTypeInformation -Append
-
-&nbsp;   }
-
+    Get-CimInstance -ClassName Win32_Product -ComputerName $computer | ForEach-Object {
+        [PSCustomObject]@{
+            ComputerName = $computer
+            Name = $_.Name
+            Version = $_.Version
+            Vendor = $_.Vendor
+        } | Export-Csv -Path $csvPath -NoTypeInformation -Append
+    }
 }
 
 ```
