@@ -252,3 +252,16 @@ Confirms each group has Full Access to its share.
 
 Confirms no other users or groups have access to these shares.
 
+![HR Folder NTFS Permissions](screenshots/01_HR_NTFS.png)
+
+![IT Folder NTFS Permissions](screenshots/02_IT_NTFS.png)
+
+![Finance Folder NTFS Permissions](screenshots/03_Finance_NTFS.png)
+
+![SMB Shares](screenshots/04_SMB_Shares.png)
+
+![HR Share Access](screenshots/05_HR_ShareAccess.png)
+
+![IT Share Access](screenshots/06_IT_ShareAccess.png)
+
+![Finance Share Access](screenshots/07_Finance_ShareAccess.png)
