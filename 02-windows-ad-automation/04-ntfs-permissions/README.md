@@ -36,7 +36,7 @@ HR\_Group
 
 ```
 
-New-ADGroup -Name "HR\_Group" -SamAccountName "HR\_Group" -GroupScope Global -Path "OU=HR,DC=corp,DC=local"
+New-ADGroup -Name "HR_Group" -SamAccountName "HR_Group" -GroupScope Global -Path "OU=HR,DC=corp,DC=local"
 
 ```
 
