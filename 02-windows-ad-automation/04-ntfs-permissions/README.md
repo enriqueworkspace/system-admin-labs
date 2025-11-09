@@ -46,7 +46,7 @@ IT\_Group
 
 ```
 
-New-ADGroup -Name "IT\_Group" -SamAccountName "IT\_Group" -GroupScope Global -Path "OU=IT,DC=corp,DC=local"
+New-ADGroup -Name "IT_Group" -SamAccountName "IT_Group" -GroupScope Global -Path "OU=IT,DC=corp,DC=local"
 
 ```
 
@@ -56,7 +56,7 @@ Finance\_Group
 
 ```
 
-New-ADGroup -Name "Finance\_Group" -SamAccountName "Finance\_Group" -GroupScope Global -Path "OU=HR,DC=corp,DC=local"
+New-ADGroup -Name "Finance_Group" -SamAccountName "Finance_Group" -GroupScope Global -Path "OU=HR,DC=corp,DC=local"
 
 ```
 
@@ -78,11 +78,11 @@ Create a folder for each group in C:\\NTFS-Lab. Each folder will store departmen
 
 ```
 
-New-Item -Path "C:\\NTFS-Lab\\HR" -ItemType Directory -Force
+New-Item -Path "C:\NTFS-Lab\HR" -ItemType Directory -Force
 
-New-Item -Path "C:\\NTFS-Lab\\IT" -ItemType Directory -Force
+New-Item -Path "C:\NTFS-Lab\IT" -ItemType Directory -Force
 
-New-Item -Path "C:\\NTFS-Lab\\Finance" -ItemType Directory -Force
+New-Item -Path "C:\NTFS-Lab\Finance" -ItemType Directory -Force
 
 ```
 
@@ -104,11 +104,11 @@ HR Folder Permissions
 
 ```
 
-$folder = "C:\\NTFS-Lab\\HR"
+$folder = "C:\NTFS-Lab\HR"
 
 $acl = Get-Acl $folder
 
-$rule = New-Object System.Security.AccessControl.FileSystemAccessRule("HR\_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
+$rule = New-Object System.Security.AccessControl.FileSystemAccessRule("HR_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
 
 $acl.SetAccessRule($rule)
 
@@ -122,11 +122,11 @@ IT Folder Permissions
 
 ```
 
-$folder = "C:\\NTFS-Lab\\IT"
+$folder = "C:\NTFS-Lab\IT"
 
 $acl = Get-Acl $folder
 
-$rule = New-Object System.Security.AccessControl.FileSystemAccessRule("IT\_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
+$rule = New-Object System.Security.AccessControl.FileSystemAccessRule("IT_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
 
 $acl.SetAccessRule($rule)
 
@@ -140,11 +140,11 @@ Finance Folder Permissions
 
 ```
 
-$folder = "C:\\NTFS-Lab\\Finance"
+$folder = "C:\NTFS-Lab\Finance"
 
 $acl = Get-Acl $folder
 
-$rule = New-Object System.Security.AccessControl.FileSystemAccessRule("Finance\_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
+$rule = New-Object System.Security.AccessControl.FileSystemAccessRule("Finance_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
 
 $acl.SetAccessRule($rule)
 
@@ -174,11 +174,11 @@ Network shares allow users to access folders over the network. Each folder is sh
 
 ```
 
-New-SmbShare -Name "HR\_Group" -Path "C:\\NTFS-Lab\\HR" -FullAccess "HR\_Group"
+New-SmbShare -Name "HR_Group" -Path "C:\NTFS-Lab\HR" -FullAccess "HR_Group"
 
-New-SmbShare -Name "IT\_Group" -Path "C:\\NTFS-Lab\\IT" -FullAccess "IT\_Group"
+New-SmbShare -Name "IT_Group" -Path "C:\NTFS-Lab\IT" -FullAccess "IT_Group"
 
-New-SmbShare -Name "Finance\_Group" -Path "C:\\NTFS-Lab\\Finance" -FullAccess "Finance\_Group"
+New-SmbShare -Name "Finance_Group" -Path "C:\NTFS-Lab\Finance" -FullAccess "Finance_Group"
 
 ```
 
@@ -204,11 +204,11 @@ NTFS Permissions Verification
 
 ```
 
-Get-Acl "C:\\NTFS-Lab\\HR" | Format-List
+Get-Acl "C:\NTFS-Lab\HR" | Format-List
 
-Get-Acl "C:\\NTFS-Lab\\IT" | Format-List
+Get-Acl "C:\NTFS-Lab\IT" | Format-List
 
-Get-Acl "C:\\NTFS-Lab\\Finance" | Format-List
+Get-Acl "C:\NTFS-Lab\Finance" | Format-List
 
 ```
 
@@ -232,11 +232,11 @@ Share Permissions Verification
 
 Get-SmbShare
 
-Get-SmbShareAccess -Name "HR\_Group"
+Get-SmbShareAccess -Name "HR_Group"
 
-Get-SmbShareAccess -Name "IT\_Group"
+Get-SmbShareAccess -Name "IT_Group"
 
-Get-SmbShareAccess -Name "Finance\_Group"
+Get-SmbShareAccess -Name "Finance_Group"
 
 ```
 
