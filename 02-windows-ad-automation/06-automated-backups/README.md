@@ -63,7 +63,7 @@ Ignores folders or files with restricted access, so the backup continues without
 Here is the complete script:
 
 
-
+```
 # Backup-Files.ps1
 # Automated backup script with error handling and logging
 
@@ -93,7 +93,7 @@ Try {
 Catch {
     "$((Get-Date).ToString('MM/dd/yyyy HH:mm:ss')) ERROR: $($_.Exception.Message)" | Out-File $LogFile -Append
 }
-
+```
 
 
 3. Testing the Script
