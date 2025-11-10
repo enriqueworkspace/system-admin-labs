@@ -2,12 +2,6 @@ Automated Backup and Snapshot Lab
 
 
 
-Environment: Windows Server 2022 (GUI)
-
-Tools: PowerShell, Task Scheduler
-
-
-
 Objective
 
 
@@ -28,17 +22,17 @@ The goal was to back up important directories regularly and log every action for
 
 Steps and Process
 
-1\. Script Preparation
+1. Script Preparation
 
 
 
-I created a folder called C:\\Scripts to store the automation script.
+I created a folder called C:\Scripts to store the automation script.
 
 Inside it, I created a file named Backup-Files.ps1.
 
 
 
-2\. Script Logic and Full Script
+2. Script Logic and Full Script
 
 
 
@@ -46,11 +40,11 @@ The script performs the following:
 
 
 
-Defines the source folder (C:\\Users\\rooty\\Desktop\\TestData) and backup root folder (C:\\Backups).
+Defines the source folder (C:\Users\rooty\Desktop\TestData) and backup root folder (C:\Backups).
 
 
 
-Generates a timestamped folder inside C:\\Backups (e.g., Backup\_2025-11-09\_22-38-03).
+Generates a timestamped folder inside C:\Backups (e.g., Backup_2025-11-09_22-38-03).
 
 
 
@@ -58,7 +52,7 @@ Copies all files from the source folder into this new folder.
 
 
 
-Writes a detailed log file (C:\\Backups\\BackupLog.txt) including start time, completion, and any errors.
+Writes a detailed log file (C:\Backups\BackupLog.txt) including start time, completion, and any errors.
 
 
 
@@ -70,76 +64,48 @@ Here is the complete script:
 
 
 
-\# Backup-Files.ps1
+# Backup-Files.ps1
+# Automated backup script with error handling and logging
 
-\# Automated backup script with error handling and logging
-
-
-
-\# Paths
-
-$SourcePath = "C:\\Users\\rooty\\Desktop\\TestData"   # Folder to back up
-
-$DestinationRoot = "C:\\Backups"                  # Backup root folder
-
-$DateTime = Get-Date -Format "yyyy-MM-dd\_HH-mm-ss"
-
-$DestinationPath = Join-Path $DestinationRoot "Backup\_$DateTime"
-
+# Paths
+$SourcePath = "C:\Users\rooty\Desktop\TestData"   # Folder to back up
+$DestinationRoot = "C:\Backups"                  # Backup root folder
+$DateTime = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+$DestinationPath = Join-Path $DestinationRoot "Backup_$DateTime"
 $LogFile = Join-Path $DestinationRoot "BackupLog.txt"
 
-
-
-\# Ensure backup root exists
-
+# Ensure backup root exists
 if (!(Test-Path -Path $DestinationRoot)) {
-
-&nbsp;   New-Item -Path $DestinationRoot -ItemType Directory | Out-Null
-
+    New-Item -Path $DestinationRoot -ItemType Directory | Out-Null
 }
 
-
-
-\# Create timestamped backup folder
-
+# Create timestamped backup folder
 New-Item -Path $DestinationPath -ItemType Directory | Out-Null
 
-
-
-\# Start log
-
+# Start log
 "$((Get-Date).ToString('MM/dd/yyyy HH:mm:ss')) Backup started from $SourcePath to $DestinationPath" | Out-File $LogFile -Append
 
-
-
-\# Copy files with error handling
-
+# Copy files with error handling
 Try {
-
-&nbsp;   Get-ChildItem -Path $SourcePath -Recurse -ErrorAction SilentlyContinue | Copy-Item -Destination $DestinationPath -Recurse -Force -ErrorAction Stop
-
-&nbsp;   "$((Get-Date).ToString('MM/dd/yyyy HH:mm:ss')) Backup completed successfully to $DestinationPath" | Out-File $LogFile -Append
-
+    Get-ChildItem -Path $SourcePath -Recurse -ErrorAction SilentlyContinue | Copy-Item -Destination $DestinationPath -Recurse -Force -ErrorAction Stop
+    "$((Get-Date).ToString('MM/dd/yyyy HH:mm:ss')) Backup completed successfully to $DestinationPath" | Out-File $LogFile -Append
 }
-
 Catch {
-
-&nbsp;   "$((Get-Date).ToString('MM/dd/yyyy HH:mm:ss')) ERROR: $($\_.Exception.Message)" | Out-File $LogFile -Append
-
+    "$((Get-Date).ToString('MM/dd/yyyy HH:mm:ss')) ERROR: $($_.Exception.Message)" | Out-File $LogFile -Append
 }
 
 
 
-3\. Testing the Script
+3. Testing the Script
 
 
 
 I ran the script manually using PowerShell:
 
 
-
-powershell.exe -ExecutionPolicy Bypass -File "C:\\Scripts\\Backup-Files.ps1"
-
+```
+powershell.exe -ExecutionPolicy Bypass -File "C:\Scripts\Backup-Files.ps1"
+```
 
 
 
@@ -148,7 +114,7 @@ I verified that:
 
 
 
-A new folder appeared in C:\\Backups with the timestamp.
+A new folder appeared in C:\Backups with the timestamp.
 
 
 
@@ -160,7 +126,7 @@ The log file correctly recorded the backup actions.
 
 
 
-4\. Automation with Task Scheduler
+4. Automation with Task Scheduler
 
 
 
@@ -179,9 +145,9 @@ Trigger: Daily at 03:00 AM
 Action: Run PowerShell with the script:
 
 
-
-powershell.exe -ExecutionPolicy Bypass -File "C:\\Scripts\\Backup-Files.ps1"
-
+```
+powershell.exe -ExecutionPolicy Bypass -File "C:\Scripts\Backup-Files.ps1"
+```
 
 
 
@@ -198,16 +164,16 @@ I tested it manually from Task Scheduler, and it executed successfully, creating
 
 
 
-5\. Verification Commands
+5. Verification Commands
 
 
 
 List recent backup folders:
 
 
-
-Get-ChildItem "C:\\Backups" | Sort-Object LastWriteTime -Descending | Select-Object -First 3
-
+```
+Get-ChildItem "C:\Backups" | Sort-Object LastWriteTime -Descending | Select-Object -First 3
+```
 
 
 
@@ -215,9 +181,9 @@ Get-ChildItem "C:\\Backups" | Sort-Object LastWriteTime -Descending | Select-Obj
 View contents of the latest backup:
 
 
-
-Get-ChildItem "C:\\Backups\\<backup\_folder\_name>"
-
+```
+Get-ChildItem "C:\Backups\<backup_folder_name>"
+```
 
 
 
@@ -225,9 +191,9 @@ Get-ChildItem "C:\\Backups\\<backup\_folder\_name>"
 View last 10 log entries:
 
 
-
-Get-Content "C:\\Backups\\BackupLog.txt" -Tail 10
-
+```
+Get-Content "C:\Backups\BackupLog.txt" -Tail 10
+```
 
 
 
@@ -235,12 +201,12 @@ Get-Content "C:\\Backups\\BackupLog.txt" -Tail 10
 Check Task Scheduler status:
 
 
-
+```
 Get-ScheduledTask -TaskName "AutomatedBackup" | Get-ScheduledTaskInfo
+```
 
 
-
-6\. Idempotency and Error Handling
+6. Idempotency and Error Handling
 
 
 
