@@ -220,3 +220,18 @@ Folders or files without permission are skipped, and errors are logged.
 
 Successful copies are logged clearly for auditing.
 
+Backup folder with timestamped files:
+
+![Backup folder](screenshots/Backup.png)
+
+Task Scheduler - list of tasks:
+
+![Task Scheduler list](screenshots/TaskScheduler_List.png)
+
+Task Scheduler - trigger (daily schedule):
+
+![Task Scheduler trigger](screenshots/TaskScheduler_Trigger.png)
+
+Task Scheduler - action (script execution):
+
+![Task Scheduler action](screenshots/TaskScheduler_Action.png)
