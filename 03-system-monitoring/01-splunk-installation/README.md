@@ -66,6 +66,6 @@ Screenshots
 
 The following images illustrate the environment and outcomes:
 
-![Splunk Service Running](splunk_service_running.png)
+![Splunk Service Running](screenshots/splunk_service_running.png)
 
-![Splunk Dashboard](splunk_dashboard.png)
+![Splunk Dashboard](screenshots/splunk_dashboard.png)
