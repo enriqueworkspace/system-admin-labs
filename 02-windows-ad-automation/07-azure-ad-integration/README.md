@@ -34,7 +34,7 @@ This lab highlights hybrid administration skills and cloud identity management.
 
 Scripts Description
 
-1\. setup-azuread.ps1
+1. setup-azuread.ps1
 
 
 
@@ -61,9 +61,9 @@ Logs actions and errors to setup-azuread-log.txt.
 Example usage:
 
 
-
-C:\\Scripts\\setup-azuread.ps1
-
+```
+C:\Scripts\setup-azuread.ps1
+```
 
 
 
@@ -71,16 +71,16 @@ C:\\Scripts\\setup-azuread.ps1
 Expected log excerpt:
 
 
-
+```
 2025-11-10 17:54:01 - AzureAD module installed successfully.
 
 2025-11-10 17:54:01 - AzureAD module imported.
 
 2025-11-10 17:54:01 - Connected to Azure AD tenant successfully.
+```
 
 
-
-2\. az-ad-ops.ps1
+2. az-ad-ops.ps1
 
 
 
@@ -115,17 +115,16 @@ Logs all actions to az-ad-ops-log.txt.
 Example usage:
 
 
-
-C:\\Scripts\\az-ad-ops.ps1
-
-
+```
+C:\Scripts\az-ad-ops.ps1
+```
 
 
 
 Expected log excerpt:
 
 
-
+```
 2025-11-10 18:08:53 - === Starting Azure AD operations ===
 
 2025-11-10 18:09:00 - Connected to Azure AD successfully.
@@ -135,7 +134,7 @@ Expected log excerpt:
 2025-11-10 18:09:02 - Lab-Test-Group verified/created successfully.
 
 2025-11-10 18:09:03 - Users assigned to Lab-Test-Group successfully.
-
+```
 
 
 Verification Commands
@@ -145,26 +144,26 @@ Verification Commands
 After running the scripts, verify results:
 
 
-
-\# List first 10 users
+```
+# List first 10 users
 
 Get-AzureADUser -Top 10
 
 
 
-\# List first 10 groups
+# List first 10 groups
 
 Get-AzureADGroup -Top 10
 
 
 
-\# Confirm Lab-Test-Group exists
+# Confirm Lab-Test-Group exists
 
-Get-AzureADGroup -All $true | Where-Object { $\_.DisplayName -eq "Lab-Test-Group" }
+Get-AzureADGroup -All $true | Where-Object { $_.DisplayName -eq "Lab-Test-Group" }
 
 
 
-\# List members of Lab-Test-Group
+# List members of Lab-Test-Group
 
 Get-AzureADGroupMember -ObjectId (Get-AzureADGroup -Filter "DisplayName eq 'Lab-Test-Group'").ObjectId
-
+```
