@@ -324,3 +324,5 @@ Conclusion
 
 This lab demonstrated end-to-end Zabbix deployment for active monitoring, focusing on proactive alerting (triggers/actions) and visualization (dashboards/items). It unified Ubuntu/Windows metrics for infrastructure control, with successful verification via simulation. This setup is scalable for production environments.
 
+![Zabbix Web UI Dashboard](screenshots/zabbix-web-ui-dashboard.png)
+
