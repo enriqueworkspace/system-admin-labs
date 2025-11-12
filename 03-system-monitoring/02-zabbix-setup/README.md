@@ -48,7 +48,7 @@ sudo mysql_secure_installation
 
 ```
 
-Set root password: [TU_CONTRASEÑA_ROOT_AQUÍ]
+Set root password: [PASSWORD_HERE]
 Removed anonymous users: Y
 Disallowed remote root: Y
 Removed test DB: Y
@@ -69,7 +69,7 @@ In MySQL shell:
 ```sql
 
 CREATE DATABASE zabbix CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-CREATE USER 'zabbix'@'localhost' IDENTIFIED WITH mysql_native_password BY '[TU_CONTRASEÑA_ZABBIX_AQUÍ]';
+CREATE USER 'zabbix'@'localhost' IDENTIFIED WITH mysql_native_password BY '[ZABBIX_PASSWORD_HERE]';
 GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
