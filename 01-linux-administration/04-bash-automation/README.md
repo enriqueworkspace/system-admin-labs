@@ -1,133 +1,102 @@
-Bash Automation Lab
-Objective
+# Bash Automation Lab: Log Backup and Rotation
 
-Automate maintenance tasks and backups on Ubuntu Server using Bash scripts.
+This lab implements automated log backups on Ubuntu Server using a Bash script, including compression, file rotation to retain only the last 7 backups, and scheduling via cron for daily maintenance.
 
-Contents
-
-Log backup scripts
-
-File rotation
-
-Backup compression
-
-Steps
-1. Environment Preparation
-
-Create backup directory:
+## 1. Environment Preparation
+Establish the backup directory structure and set ownership:
 ```
 sudo mkdir -p /opt/backups/logs
 sudo chown $USER:$USER /opt/backups/logs
 ```
+This creates `/opt/backups/logs` (with parents if needed) and assigns ownership to the current user for non-sudo access.
 
-Explanation:
-
-mkdir -p creates the folder /opt/backups/logs, including parent directories.
-
-chown $USER:$USER assigns ownership to the current user, avoiding the need for sudo every time.
-
-2. Create Backup Script
-
-Create the script file:
+## 2. Create Backup Script
+Generate the script file:
 ```
 nano ~/backup_logs.sh
 ```
 
-Paste:
-```
+Insert the following content:
+```bash
 #!/bin/bash
-
 # Variables
 BACKUP_DIR="/opt/backups/logs"
 LOG_DIR="/var/log"
 DATE=$(date +'%Y-%m-%d')
 BACKUP_FILE="logs-$DATE.tar.gz"
-
 # Create compressed backup
 tar -czf "$BACKUP_DIR/$BACKUP_FILE" "$LOG_DIR"
-
 # Keep only last 7 backups
 cd "$BACKUP_DIR"
 ls -tp | grep -v '/$' | tail -n +8 | xargs -I {} rm -- {}
-
 # Log activity
 echo "$(date '+%Y-%m-%d %H:%M:%S') Backup created: $BACKUP_FILE" >> "$BACKUP_DIR/backup.log"
 ```
 
-Save and exit (Ctrl + O, Enter, Ctrl + X).
+Save and exit (Ctrl+O, Enter, Ctrl+X).
 
-Make it executable:
+Render executable:
 ```
 chmod +x ~/backup_logs.sh
 ```
-3. Manual Test
 
-Run the script:
+## 3. Manual Test
+Execute the script:
 ```
 bash ~/backup_logs.sh
 ```
 
-Verify results:
+Inspect outcomes:
 ```
 ls -lh /opt/backups/logs
 cat /opt/backups/logs/backup.log
 ```
+Expected: `logs-YYYY-MM-DD.tar.gz` file present; log entry with timestamp.
 
-Expected outcome:
-
-logs-YYYY-MM-DD.tar.gz created
-
-Entry in backup.log with timestamp
-
-4. Automate with Cron
-
-Open user cron:
+## 4. Automate with Cron
+Edit the user crontab:
 ```
 crontab -e
 ```
 
-Add:
+Append this entry (replace `/home/your_user/` with the actual path):
 ```
 0 2 * * * /home/your_user/backup_logs.sh
 ```
+- `0 2`: Executes at 2:00 AM.
+- `* * *`: Runs daily.
 
-Explanation:
+Save and exit (Ctrl+O, Enter, Ctrl+X).
 
-0 → minute 0
-
-2 → hour 2 (2:00 AM)
-
-* * * → every day, month, and weekday
-
-Save (Ctrl + O, Enter) and exit (Ctrl + X).
-
-Check cron:
+List jobs for confirmation:
 ```
 crontab -l
 ```
-5. Test Cron Execution
 
-To test without waiting until 2:00 AM, temporarily change the line:
+## 5. Test Cron Execution
+For immediate testing, edit crontab to:
 ```
 */2 * * * * /home/your_user/backup_logs.sh
 ```
+This schedules runs every 2 minutes.
 
-This runs the script every 2 minutes.
-
-Wait a few minutes and check:
+Monitor after a few minutes:
 ```
 ls -lh /opt/backups/logs
 cat /opt/backups/logs/backup.log
 ```
 
-Once confirmed, revert cron to original schedule.
+Revert to the original schedule (`0 2 * * *`) once verified.
 
-6. Notes and Observations
+## Notes
+- `tar -czf` applies gzip compression to reduce storage.
+- `ls -tp | grep -v '/$' | tail -n +8 | xargs rm` sorts files by time and removes all but the newest 7.
+- Use `crontab -l` to review scheduled tasks.
+- The `backup.log` file records execution history for auditing.
 
-tar -czf compresses backups to save space
+## Summary
+- Backup directory prepared and script created with compression and rotation.
+- Manual execution tested successfully.
+- Cron scheduled for daily 2:00 AM runs, with verification method.
 
-ls -tp | grep -v '/$' | tail -n +8 | xargs rm keeps only the last 7 backups
-
-Always verify cron jobs with crontab -l
-
-Keep backup.log to track script execution history
+This automation ensures consistent log archiving and space management.
