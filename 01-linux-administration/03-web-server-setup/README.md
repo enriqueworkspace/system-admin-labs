@@ -1,63 +1,60 @@
-This lab demonstrates the installation and configuration of an Apache web server on Ubuntu Server with HTTPS enabled using a self-signed certificate. It covers:
+# Apache Web Server Installation and Configuration with HTTPS
 
-- Updating the system
-- Installing Apache
-- Configuring UFW firewall
-- Creating a test website
-- Setting up Virtual Hosts for HTTP and HTTPS
-- Generating a self-signed SSL certificate
-- Testing site access
+This lab details the setup of Apache on Ubuntu Server, including system updates, firewall adjustments, virtual host configuration for HTTP and HTTPS, and generation of a self-signed SSL certificate for secure access.
 
----
-
-## Step 1: Update the system
-
-Update the package list and upgrade installed packages:
-
+## 1. Update the System
+Refresh the package index and upgrade existing packages to ensure compatibility:
 ```
 sudo apt update
 sudo apt upgrade -y
 ```
-Step 2: Install Apache
 
-Install Apache web server:
+## 2. Install Apache
+Install the Apache web server package:
 ```
 sudo apt install apache2 -y
 ```
-Verify Apache is running:
+
+Confirm the service is active:
 ```
 sudo systemctl status apache2
 ```
-Step 3: Configure UFW firewall
+Expected: "active (running)" status.
 
-Allow HTTP and HTTPS traffic:
+## 3. Configure UFW Firewall
+Permit HTTP (port 80) and HTTPS (port 443) traffic:
 ```
 sudo ufw allow 'Apache Full'
 sudo ufw enable
 sudo ufw status
 ```
-Step 4: Create a test website
+Expected: "Apache Full" listed as ALLOW.
 
-Create the website directory and set ownership:
+## 4. Create a Test Website
+Establish the site directory and assign ownership to the current user:
 ```
 sudo mkdir -p /var/www/mywebsite
 sudo chown -R $USER:$USER /var/www/mywebsite
 ```
-Create a simple index.html page:
+
+Generate a basic index page:
 ```
 echo "<h1>My first website with HTTPS</h1>" > /var/www/mywebsite/index.html
 ```
-Verify content:
+
+Inspect the file:
 ```
 cat /var/www/mywebsite/index.html
 ```
-Step 5: Configure Virtual Host for HTTP
+Expected: The HTML heading displayed.
 
-Create a configuration file:
+## 5. Configure Virtual Host for HTTP
+Define the virtual host configuration:
 ```
 sudo nano /etc/apache2/sites-available/mywebsite.conf
 ```
-Content:
+
+Insert the following content:
 ```
 <VirtualHost *:80>
     ServerAdmin admin@example.com
@@ -67,71 +64,87 @@ Content:
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
-Enable the site and reload Apache:
+
+Activate the site and reload Apache:
 ```
 sudo a2ensite mywebsite.conf
 sudo systemctl reload apache2
 ```
-Add a hosts entry to resolve mywebsite.local (inside the VM):
+
+Map the domain locally by editing the hosts file:
 ```
 sudo nano /etc/hosts
 ```
-Add:
+
+Append this entry (using the server's IP):
 ```
 192.168.0.150 mywebsite.local
 ```
-Test access:
+
+Validate HTTP access:
 ```
 curl http://mywebsite.local
 ```
-Step 6: Enable HTTPS with self-signed certificate
+Expected: The HTML heading returned.
 
-Install OpenSSL (if not already installed):
+## 6. Enable HTTPS with Self-Signed Certificate
+Install OpenSSL for certificate generation:
 ```
 sudo apt install openssl -y
 ```
-Generate certificate and private key:
+
+Produce the certificate and key (valid for 365 days):
 ```
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 -keyout /etc/ssl/private/mywebsite.key \
 -out /etc/ssl/certs/mywebsite.crt
 ```
-When prompted, use:
-```
-Country Name: VE
-State: Miranda
-Locality: Caracas
-Organization: MyLab
-Organizational Unit: IT
-Common Name: mywebsite.local
-Email Address: admin@example.com
-```
-Create HTTPS Virtual Host:
+
+Provide these details during prompts:
+- Country Name: VE
+- State: Miranda
+- Locality: Caracas
+- Organization: MyLab
+- Organizational Unit: IT
+- Common Name: mywebsite.local
+- Email Address: admin@example.com
+
+Configure the HTTPS virtual host:
 ```
 sudo nano /etc/apache2/sites-available/mywebsite-ssl.conf
 ```
-Content:
+
+Insert the following content:
 ```
 <VirtualHost *:443>
     ServerAdmin admin@example.com
     ServerName mywebsite.local
     DocumentRoot /var/www/mywebsite
-
     SSLEngine on
     SSLCertificateFile /etc/ssl/certs/mywebsite.crt
     SSLCertificateKeyFile /etc/ssl/private/mywebsite.key
-
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
-Enable SSL and the site:
+
+Enable the SSL module and site, then restart Apache:
 ```
 sudo a2enmod ssl
 sudo a2ensite mywebsite-ssl.conf
 sudo systemctl restart apache2
 ```
-Test HTTPS access (ignore self-signed warning):
+
+Test HTTPS access (bypassing self-signed certificate validation):
 ```
 curl -k https://mywebsite.local
 ```
+Expected: The HTML heading returned, confirming secure access.
+
+## Summary
+- System updated and Apache installed with firewall rules applied.
+- HTTP virtual host configured and tested.
+- Self-signed SSL certificate generated and HTTPS virtual host enabled.
+- Local access verified for both protocols.
+
+This setup provides a functional web server with basic security. For production, replace the self-signed certificate with a CA-issued one.
