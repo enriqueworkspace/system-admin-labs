@@ -30,21 +30,6 @@ Demonstrate basic offboarding (user disabling)
 
 
 
-Lab Structure
-
-```
-
-02-user-onboarding-lab/
-
-├── onboarding.sh    # Main automation script
-
-├── users.csv        # Input file with usernames, full names, and groups
-
-└── README.md        # This documentation
-
-```
-
-
 
 Files Description
 
@@ -80,7 +65,7 @@ users.csv: CSV file structured as:
 
 ```
 
-username,full\_name,primary\_group,secondary\_groups
+username,full_name,primary_group,secondary_groups
 
 jdoe,John Doe,development,"sales,management"
 
@@ -126,7 +111,7 @@ Run the script as root:
 
 ```
 
-sudo ./onboarding.sh
+sudo .onboarding.sh
 
 ```
 
@@ -156,25 +141,25 @@ Verification Commands
 
 ```
 
-\# List users
+# List users
 
 awk -F: '$3 >= 1000 {print $1}' /etc/passwd
 
 
 
-\# List groups
+# List groups
 
 getent group | grep -E 'development|sales|management'
 
 
 
-\# Check home directories
+# Check home directories
 
 ls -ld /home/jdoe /home/asmith /home/rbrown
 
 
 
-\# Check disabled account
+# Check disabled account
 
 sudo passwd -S rbrown
 
