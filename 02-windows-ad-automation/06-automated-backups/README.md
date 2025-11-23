@@ -1,90 +1,35 @@
-Automated Backup and Snapshot Lab
+# Automated Backup and Snapshot Lab
 
+This lab implements a PowerShell-based automated backup system for file directories on Windows Server, integrated with Task Scheduler for daily execution. It includes timestamped folder creation, recursive copying with error handling, and comprehensive logging for auditing.
 
-
-Objective
-
-
-
-Automate file backups using PowerShell and Windows Task Scheduler to ensure data protection and operational resilience.
-
-
-
-Lab Overview
-
-
-
-In this lab, I created an automated backup system using a PowerShell script and Task Scheduler.
-
-The goal was to back up important directories regularly and log every action for auditing and troubleshooting.
-
-
-
-Steps and Process
-
-1. Script Preparation
-
-
-
-I created a folder called C:\Scripts to store the automation script.
-
-Inside it, I created a file named Backup-Files.ps1.
-
-
-
-2. Script Logic and Full Script
-
-
-
-The script performs the following:
-
-
-
-Defines the source folder (C:\Users\rooty\Desktop\TestData) and backup root folder (C:\Backups).
-
-
-
-Generates a timestamped folder inside C:\Backups (e.g., Backup_2025-11-09_22-38-03).
-
-
-
-Copies all files from the source folder into this new folder.
-
-
-
-Writes a detailed log file (C:\Backups\BackupLog.txt) including start time, completion, and any errors.
-
-
-
-Ignores folders or files with restricted access, so the backup continues without stopping.
-
-
-
-Here is the complete script:
-
-
+## 1. Script Preparation
+Create the script directory and file:
 ```
+New-Item -Path "C:\Scripts" -ItemType Directory -Force
+```
+Develop `Backup-Files.ps1` in `C:\Scripts\`.
+
+## 2. Script Logic and Full Script
+The script defines source (`C:\Users\rooty\Desktop\TestData`) and destination (`C:\Backups`) paths, generates a timestamped subfolder, copies contents recursively (skipping inaccessible items), and logs start/completion/errors to `C:\Backups\BackupLog.txt`.
+
+Full script:
+```powershell
 # Backup-Files.ps1
 # Automated backup script with error handling and logging
-
 # Paths
-$SourcePath = "C:\Users\rooty\Desktop\TestData"   # Folder to back up
-$DestinationRoot = "C:\Backups"                  # Backup root folder
+$SourcePath = "C:\Users\rooty\Desktop\TestData" # Folder to back up
+$DestinationRoot = "C:\Backups" # Backup root folder
 $DateTime = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $DestinationPath = Join-Path $DestinationRoot "Backup_$DateTime"
 $LogFile = Join-Path $DestinationRoot "BackupLog.txt"
-
 # Ensure backup root exists
 if (!(Test-Path -Path $DestinationRoot)) {
     New-Item -Path $DestinationRoot -ItemType Directory | Out-Null
 }
-
 # Create timestamped backup folder
 New-Item -Path $DestinationPath -ItemType Directory | Out-Null
-
 # Start log
 "$((Get-Date).ToString('MM/dd/yyyy HH:mm:ss')) Backup started from $SourcePath to $DestinationPath" | Out-File $LogFile -Append
-
 # Copy files with error handling
 Try {
     Get-ChildItem -Path $SourcePath -Recurse -ErrorAction SilentlyContinue | Copy-Item -Destination $DestinationPath -Recurse -Force -ErrorAction Stop
@@ -95,143 +40,57 @@ Catch {
 }
 ```
 
-
-3. Testing the Script
-
-
-
-I ran the script manually using PowerShell:
-
-
+## 3. Testing the Script
+Execute manually:
 ```
 powershell.exe -ExecutionPolicy Bypass -File "C:\Scripts\Backup-Files.ps1"
 ```
+Verify:
+- Timestamped folder in `C:\Backups` (e.g., `Backup_2025-11-09_22-38-03`).
+- Copied files (e.g., `file1.txt`, `file2.txt`).
+- Log entries in `C:\Backups\BackupLog.txt`.
 
+## 4. Automation with Task Scheduler
+Create task "AutomatedBackup":
+- Trigger: Daily at 03:00 AM.
+- Action: `powershell.exe -ExecutionPolicy Bypass -File "C:\Scripts\Backup-Files.ps1"`.
+- Settings: Highest privileges; run whether logged on or not.
 
+Test via Task Scheduler manual run; confirm folder/log updates.
 
-
-I verified that:
-
-
-
-A new folder appeared in C:\Backups with the timestamp.
-
-
-
-The files file1.txt and file2.txt from TestData were copied.
-
-
-
-The log file correctly recorded the backup actions.
-
-
-
-4. Automation with Task Scheduler
-
-
-
-To automate the backup, I created a scheduled task:
-
-
-
-Name: AutomatedBackup
-
-
-
-Trigger: Daily at 03:00 AM
-
-
-
-Action: Run PowerShell with the script:
-
-
-```
-powershell.exe -ExecutionPolicy Bypass -File "C:\Scripts\Backup-Files.ps1"
-```
-
-
-
-
-Run with highest privileges: Enabled
-
-
-
-Run whether user is logged on or not: Enabled
-
-
-
-I tested it manually from Task Scheduler, and it executed successfully, creating the backup folder and updating the log.
-
-
-
-5. Verification Commands
-
-
-
-List recent backup folders:
-
-
+## 5. Verification Commands
+Recent backups:
 ```
 Get-ChildItem "C:\Backups" | Sort-Object LastWriteTime -Descending | Select-Object -First 3
 ```
 
-
-
-
-View contents of the latest backup:
-
-
+Latest backup contents:
 ```
 Get-ChildItem "C:\Backups\<backup_folder_name>"
 ```
 
-
-
-
-View last 10 log entries:
-
-
+Recent logs:
 ```
 Get-Content "C:\Backups\BackupLog.txt" -Tail 10
 ```
 
-
-
-
-Check Task Scheduler status:
-
-
+Task status:
 ```
 Get-ScheduledTask -TaskName "AutomatedBackup" | Get-ScheduledTaskInfo
 ```
 
+## 6. Idempotency and Error Handling
+Multiple runs generate unique timestamped folders, preventing overwrites. Inaccessible items are skipped (`-ErrorAction SilentlyContinue`); errors logged without halting.
 
-6. Idempotency and Error Handling
+![Backup Folder](screenshots/Backup.png)
+![Task Scheduler List](screenshots/TaskScheduler_List.png)
+![Task Scheduler Trigger](screenshots/TaskScheduler_Trigger.png)
+![Task Scheduler Action](screenshots/TaskScheduler_Action.png)
 
+## Summary
+- PowerShell script developed for recursive backups with logging.
+- Manual testing confirmed file copying and log accuracy.
+- Task Scheduler configured for daily automation at 03:00 AM.
+- Verifications ensure operational integrity and idempotency.
 
-
-Running the script multiple times creates new timestamped folders, avoiding overwrites.
-
-
-
-Folders or files without permission are skipped, and errors are logged.
-
-
-
-Successful copies are logged clearly for auditing.
-
-Backup folder with timestamped files:
-
-![Backup folder](screenshots/Backup.png)
-
-Task Scheduler - list of tasks:
-
-![Task Scheduler list](screenshots/TaskScheduler_List.png)
-
-Task Scheduler - trigger (daily schedule):
-
-![Task Scheduler trigger](screenshots/TaskScheduler_Trigger.png)
-
-Task Scheduler - action (script execution):
-
-![Task Scheduler action](screenshots/TaskScheduler_Action.png)
+This system provides resilient data protection with minimal intervention.

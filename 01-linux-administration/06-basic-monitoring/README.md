@@ -1,340 +1,172 @@
-Lab 06 - Basic Monitoring with Native Commands
+# Basic Monitoring with Native Linux Commands
 
+This lab documents native Linux commands for system monitoring and troubleshooting, including diagnostics for processes, resources, storage, memory, network, and logs to identify performance issues.
 
-
-Objective
-
-Learn and document the use of native Linux commands for monitoring and troubleshooting the system.  
-
-Understand system diagnostics, resource usage, and identify potential performance issues.
-
-
-
-Lab Path
-
-`01-linux-administration/06-basic-monitoring`
-
-
-
-Commands and Practices
-
-
-
----
-
-
-
-1. `top`
-
-Command:
-
+## 1. top
+Execute:
 ```
 top
 ```
 
-
-Purpose:
-
-Display active processes and system resource usage in real-time.
-
-
+Purpose: Displays real-time active processes and system resource usage.
 
 Observations:
-
-Load average shows CPU load over the last 1, 5, and 15 minutes.
-
-Tasks summary shows total processes, running, sleeping, stopped, and zombie processes.
-
-%CPU and %MEM columns indicate which processes use the most CPU and memory.
-
-Idle CPU percentage and memory usage indicate system availability.
+- Load average reflects CPU load over 1, 5, and 15 minutes.
+- Tasks summary includes total, running, sleeping, stopped, and zombie processes.
+- %CPU and %MEM columns highlight high-usage processes.
+- Idle CPU percentage and memory usage indicate availability.
 
 Example output:
-
-
-
 ```
-top - 22:24:07 up 19:58,  3 users,  load average: 0.00, 0.00, 0.00
-
-Tasks: 127 total,   1 running, 126 sleeping,   0 stopped,   0 zombie
-
-%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni, 99.8 id,  0.2 wa,  0.0 hi,  0.0 si,  0.0 st
-
-MiB Mem :   5827.3 total,   3853.4 free,    535.9 used,   1724.6 buff/cache
-
-MiB Swap:      0.0 total,      0.0 free,      0.0 used.   5291.4 avail Mem
+top - 22:24:07 up 19:58, 3 users, load average: 0.00, 0.00, 0.00
+Tasks: 127 total, 1 running, 126 sleeping, 0 stopped, 0 zombie
+%Cpu(s): 0.0 us, 0.0 sy, 0.0 ni, 99.8 id, 0.2 wa, 0.0 hi, 0.0 si, 0.0 st
+MiB Mem : 5827.3 total, 3853.4 free, 535.9 used, 1724.6 buff/cache
+MiB Swap: 0.0 total, 0.0 free, 0.0 used. 5291.4 avail Mem
 ```
 
-2. htop
-
-
-Command:
-
+## 2. htop
+Execute:
 ```
 htop
 ```
 
-Purpose:
-
-Interactive process viewer; displays CPU per core, memory, swap, and process list visually.
-
-
+Purpose: Provides an interactive process viewer with visual representations of CPU per core, memory, swap, and processes.
 
 Observations:
+- Bars illustrate CPU usage per core and memory allocation.
+- Color-coded processes facilitate analysis.
+- Enables quick identification of high-resource consumers and system load.
 
-
-Bars show CPU usage per core and memory usage.
-
-Processes are color-coded for easier analysis.
-
-Useful for quickly identifying high-resource processes and overall system load.
-
-
-
-3. vmstat
-
-
-Command:
-
+## 3. vmstat
+Execute:
 ```
-
 vmstat 2 5
-
 ```
 
-Purpose:
-
-Show system statistics including CPU, memory, swap, I/O, and processes over time.
-
-
+Purpose: Reports system statistics for CPU, memory, swap, I/O, and processes at intervals (2 seconds, 5 reports).
 
 Observations:
+- `r` column: Processes awaiting CPU.
+- `wa` column: Time spent waiting for I/O.
+- `id`: Idle CPU percentage.
+- Elevated `wa` with low `id` signals potential disk bottlenecks.
 
-r column shows processes waiting for CPU.
-
-wa column indicates time waiting for I/O (disk or network).
-
-id shows idle CPU percentage.
-
-High wa with low id may indicate disk bottlenecks.
-
-
-
-4. ps
-
-
-Command:
-
+## 4. ps
+Execute:
 ```
-
 ps -ef
-
 ```
 
-Purpose:
-
-Display detailed list of all running processes.
+Purpose: Lists all running processes in full detail.
 
 Flags:
-
--e → show all processes
-
--f → full-format listing including UID, PID, PPID, time, and command
+- `-e`: All processes.
+- `-f`: Full format (UID, PID, PPID, time, command).
 
 Observations:
+- Reveals active processes and PIDs.
+- Supports user/service association.
+- Pair with `grep` for filtering (e.g., `ps -ef | grep apache`).
 
-Identify active processes and their PIDs.
-
-Useful to check which processes belong to which user or service.
-
-Can combine with grep to filter for specific processes.
-
-
-
-5. df
-
-
-
-Command:
-
+## 5. df
+Execute:
 ```
 df -h
 ```
 
-Purpose:
-
-Check disk usage per filesystem in a human-readable format.
+Purpose: Reports disk usage per filesystem in human-readable format.
 
 Observations:
+- Displays total, used, and available space.
+- Identifies full partitions or storage constraints.
 
-Shows total, used, and available space.
-
-Useful to detect full partitions or storage issues.
-
-
-
-6. du
-
-
-Command:
-
+## 6. du
+Execute:
 ```
 du -sh /var/log
 ```
 
-Purpose:
-
-Measure size of a directory or file in a summarized, human-readable format.
+Purpose: Estimates directory or file size in summarized, human-readable format.
 
 Observations:
+- Pinpoints space-intensive directories.
+- Monitors logs or temporary files.
 
-Helps find directories consuming large amounts of space.
-
-Can be used to monitor log directories or temporary files.
-
-
-
-7. free
-
-
-Command:
-
+## 7. free
+Execute:
 ```
 free -h
 ```
 
-Purpose:
-
-Display memory usage including total, used, free, and swap in human-readable format.
+Purpose: Shows memory usage (total, used, free, swap) in human-readable format.
 
 Observations:
+- Assesses RAM availability.
+- Swap usage indicates memory pressure.
 
-Confirms RAM usage and availability.
-
-Check swap usage to determine if the system is memory constrained.
-
-
-
-8. uptime
-
-
-Command:
-
+## 8. uptime
+Execute:
 ```
 uptime
 ```
 
-Purpose:
-
-Check system uptime and load average.
+Purpose: Reports system uptime and load average.
 
 Observations:
+- Indicates runtime duration.
+- Load average summarizes CPU demand.
 
-Shows how long the system has been running.
-
-Load average gives a quick overview of CPU demand.
-
-
-
-9. netstat
-
-
-
-Command:
-
+## 9. netstat
+Execute:
 ```
 netstat -tulnp
 ```
 
-Purpose:
-
-List listening ports, network connections, and associated processes.
+Purpose: Lists listening ports, connections, and associated processes.
 
 Flags:
-
--t → TCP connections
-
--u → UDP connections
-
--l → listening ports
-
--n → numeric addresses and ports
-
--p → show PID/program name
+- `-t`: TCP.
+- `-u`: UDP.
+- `-l`: Listening.
+- `-n`: Numeric.
+- `-p`: PID/program.
 
 Observations:
+- Identifies active services and ports.
+- Detects unauthorized openings.
 
-Identify which services are active and their ports.
-
-Detect unauthorized services or open ports.
-
-
-
-10. lsof
-
-
-
-Command:
-
+## 10. lsof
+Execute:
 ```
 lsof -i :22
 ```
 
-Purpose:
-
-List open files and network connections. Useful for debugging services.
+Purpose: Lists open files and network connections for debugging.
 
 Observations:
+- Reveals processes bound to ports (e.g., SSH on 22).
+- Filters by user, directory, or name.
 
-Shows which process is using a specific port (e.g., SSH on port 22).
-
-Can filter by user, directory, or process name.
-
-
-
-11. journalctl
-
-
-
-Command:
-
+## 11. journalctl
+Execute:
 ```
 journalctl -xe | less
 ```
 
-Purpose:
-
-View detailed system logs with explanations, paginated for readability.
+Purpose: Views system logs with explanations, paginated.
 
 Observations:
+- Captures errors, warnings, and events.
+- Filters by service (`-u ssh`) or date.
+- Aids in failure analysis.
 
-Track system errors, warnings, and service events.
+## Summary
+- `top`/`htop`: Real-time process and CPU monitoring.
+- `vmstat`: CPU, memory, and I/O statistics.
+- `ps`: Process details.
+- `df`/`du`/`free`: Storage and memory assessment.
+- `netstat`/`lsof`: Network and port inspection.
+- `journalctl`: Log review.
 
-Can filter by service (journalctl -u ssh) or date.
-
-Helps troubleshoot system and service failures.
-
-
-
-Summary
-
-
-
-This lab introduced the native Linux commands for system monitoring.
-
-Key takeaways:
-
-top/htop for real-time process and CPU monitoring.
-
-vmstat for CPU, memory, and I/O analysis.
-
-ps for process inspection.
-
-df/du/free for storage and memory checks.
-
-netstat/lsof for network and port monitoring.
-
-journalctl for system logs.
-
-
-
+These commands form the foundation for proactive system diagnostics.

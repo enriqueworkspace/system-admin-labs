@@ -1,344 +1,132 @@
-Essential Services Configuration: SSH, Cron Jobs, Firewall, and Systemd Services
+# Essential Services Configuration: SSH, Cron Jobs, Firewall, and Systemd Services
 
+This lab covers the setup and verification of core Ubuntu Server services: secure SSH for remote access, cron for task automation, UFW firewall for access control, and a custom systemd service with dependencies. All operations were conducted in a VirtualBox Ubuntu Server VM.
 
-
-This lab demonstrates the configuration and management of essential services on Ubuntu Server, including secure remote access, scheduled tasks, firewall rules, and custom systemd services. All steps were performed in a VirtualBox Ubuntu Server VM.
-
-
-
-1\. SSH Configuration
-
-
-
-Objective: Enable secure remote access to the server.
-
-
-
-Steps:
-
-
-
-Check if SSH server is installed:
-
+## 1. SSH Configuration
+Verify installation of the OpenSSH server package:
 ```
-
 dpkg -l | grep openssh-server
-
 ```
+Expected: `openssh-server` listed as installed.
 
-
-
-Output confirms openssh-server is installed.
-
-
-
-Verify SSH service status:
-
+Check service status:
 ```
-
 sudo systemctl status ssh
-
 ```
+Expected: Active (running) and enabled.
 
-
-
-Status: active (running) and enabled at boot.
-
-
-
-Enable SSH to start on boot (if not already):
-
+Enable on boot if required:
 ```
-
 sudo systemctl enable ssh
-
 ```
 
-
-
-Test SSH connection locally on VM:
-
+Test local connection:
 ```
-
 ssh rooty@localhost
-
 ```
+Enter password to authenticate.
 
-
-
-Test SSH connection from host machine:
-
+Test remote connection from host machine:
 ```
-
 ssh rooty@192.168.0.150
-
 ```
+VM IP: 192.168.0.150; Username: rooty. Successful login confirms network and service functionality.
 
-
-
-VM IP: 192.168.0.150
-
-
-
-Username: rooty
-
-
-
-Observations:
-
-
-
-SSH service was active and allowed remote login successfully.
-
-
-
-Connection from host confirmed proper network setup and service availability.
-
-
-
-2\. Cron Jobs
-
-
-
-Objective: Automate tasks using cron.
-
-
-
-Existing Cron Job:
-
+## 2. Cron Jobs
+Review existing job for daily backup execution:
 ```
-
-0 2 \* \* \* /home/rooty/back\_logs.sh
-
+crontab -l
 ```
+Entry: `0 2 * * * /home/rooty/back_logs.sh` (runs at 2:00 AM).
 
-
-
-Executes the back\_logs.sh script daily at 2:00 a.m.
-
-
-
-Test Cron Job:
-
+Add test job for minute-by-minute logging:
 ```
-
-\* \* \* \* \* echo "Test cron $(date)" >> /home/rooty/cron\_test.log
-
+crontab -e
 ```
+Append: `* * * * * echo "Test cron $(date)" >> /home/rooty/cron_test.log`
 
-
-
-Writes timestamp to cron\_test.log every minute for testing.
-
-
-
-Verification:
-
+Monitor execution:
 ```
-
-tail -f /home/rooty/cron\_test.log
-
+tail -f /home/rooty/cron_test.log
 ```
+Expected: New timestamp entries every minute.
 
+Manage cron:
+- Edit: `crontab -e`
+- Service status: `sudo systemctl status cron` (expected: active and enabled).
 
+Remove test job after verification via `crontab -e`.
 
-Observed new entries every minute, confirming execution.
-
-
-
-Commands to manage cron:
-
-
-
-Edit user crontab: crontab -e
-
-
-
-Verify cron service: sudo systemctl status cron
-
-
-
-Observations:
-
-
-
-Both scheduled tasks executed successfully.
-
-
-
-Cron service was active and enabled at boot.
-
-
-
-3\. Firewall Configuration (UFW)
-
-
-
-Objective: Restrict network access and allow only necessary services.
-
-
-
-Default Policies:
-
+## 3. Firewall Configuration (UFW)
+Set default policies to deny incoming and allow outgoing traffic:
 ```
-
 sudo ufw default deny incoming
-
 sudo ufw default allow outgoing
-
 ```
 
-
-
-Allowed Services:
-
+Permit SSH:
+```
+sudo ufw allow 22/tcp
 ```
 
-sudo ufw allow 22/tcp   # SSH
-
+Activate logging:
 ```
-
-
-
-Enable Logging:
-
-```
-
 sudo ufw logging on
-
 ```
 
-
-
-Verification:
-
+Enable and inspect status:
 ```
-
+sudo ufw enable
 sudo ufw status numbered
-
 ```
+Expected: Only port 22/tcp allowed.
 
-
-
-Confirmed only allowed ports are open.
-
-
-
-Testing Blocked Ports:
-
+Test blocked port (e.g., 80, with Apache stopped):
 ```
-
 nc -zv 192.168.0.150 80
+```
+Expected: Connection refused.
 
+## 4. Systemd Service
+Create the service file:
+```
+sudo nano /etc/systemd/system/test_service.service
 ```
 
-
-
-Connection refused because Apache2 was stopped and port 80 was blocked.
-
-
-
-Observations:
-
-
-
-Firewall correctly blocked unauthorized ports while allowing SSH.
-
-
-
-Logging enabled for monitoring incoming connections.
-
-
-
-4\. Systemd Service
-
-
-
-Objective: Create and manage a custom service that depends on UFW.
-
-
-
-Service File: /etc/systemd/system/test\_service.service
-
+Insert content:
 ```
-
-\[Unit]
-
+[Unit]
 Description=Test Service
-
 After=ufw.service
 
-
-
-\[Service]
-
+[Service]
 Type=simple
-
-ExecStart=/bin/bash -c 'echo "Service started $(date)" >> /home/rooty/test\_service.log'
-
+ExecStart=/bin/bash -c 'echo "Service started $(date)" >> /home/rooty/test_service.log'
 Restart=on-failure
 
-
-
-\[Install]
-
+[Install]
 WantedBy=multi-user.target
-
 ```
 
-
-
-Commands:
-
+Reload daemon, enable, and start:
 ```
-
 sudo systemctl daemon-reload
-
-sudo systemctl enable test\_service
-
-sudo systemctl start test\_service
-
-sudo cat /home/rooty/test\_service.log
-
+sudo systemctl enable test_service
+sudo systemctl start test_service
 ```
 
+View log output:
+```
+sudo cat /home/rooty/test_service.log
+```
+Expected: Timestamp entry on startup.
 
+The service depends on UFW, restarts on failure, and activates at boot.
 
-Observations:
+## Summary
+- SSH installed, enabled, and tested for local/remote access.
+- Cron configured for automated backups and verified through test logging.
+- UFW implemented default-deny policy, allowing only SSH with logging enabled; blocked ports confirmed.
+- Custom systemd service created with UFW dependency, enabled, and operational.
 
-
-
-Service writes timestamp to log at startup.
-
-
-
-Dependent on UFW, ensuring firewall is active before service starts.
-
-
-
-Enabled at boot and restarts on failure.
-
-
-
-Summary
-
-
-
-SSH configured and tested for remote access.
-
-
-
-Cron jobs automated backup script and test logging.
-
-
-
-UFW firewall enforced default-deny policy and allowed only required ports.
-
-
-
-Systemd service created to demonstrate service management and dependency on firewall.
-
-
-
-All configurations were verified and documented for reproducibility.
-
+These configurations ensure secure, automated, and controlled server operations.

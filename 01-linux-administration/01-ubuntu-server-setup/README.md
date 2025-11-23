@@ -1,24 +1,18 @@
-Ubuntu Server Setup – Basic Installation and Configuration
-Objective
+# Ubuntu Server Setup: Basic Installation and Configuration
 
-This practice demonstrates how to set up and configure a Ubuntu Server from scratch, including static IP, hostname, DNS, and SSH access. It also covers problem-solving steps encountered during the setup.
+This guide details the configuration of a new Ubuntu Server instance, focusing on static IP assignment, hostname and DNS setup, and SSH enablement. It includes resolution of a common networking issue. Follow the steps sequentially for a stable server environment.
 
-1️⃣ Static IP Configuration
+## 1. Static IP Configuration
 
-Purpose: Assign a fixed IP address to ensure stable network connectivity.
-
-Steps:
-
-Edit the Netplan configuration file:
+Edit the Netplan configuration file to assign a static IP:
 
 ```
 sudo nano /etc/netplan/00-installer-config.yaml
 ```
 
+Apply the following configuration (verify the interface name with `ip link` if needed):
 
-Configuration used:
-
-```
+```yaml
 network:
   version: 2
   renderer: networkd
@@ -31,44 +25,36 @@ network:
         addresses: [8.8.8.8, 8.8.4.4]
 ```
 
-
-Set correct permissions:
+Set permissions:
 
 ```
 sudo chmod 600 /etc/netplan/00-installer-config.yaml
 ```
 
-
-Apply the configuration:
+Apply changes:
 
 ```
 sudo netplan apply
 ```
 
-
-Verify the IP:
+Verify the IP assignment:
 
 ```
 ip a show enp0s3
 ```
 
-
-Problem encountered: A secondary dynamic IP (192.168.0.120) appeared due to Cloud-init.
-
-Solution: Rename the Cloud-init Netplan file and reapply:
+**Issue Resolution:** If a secondary dynamic IP appears (e.g., 192.168.0.120 from Cloud-Init), rename the conflicting file:
 
 ```
 sudo mv /etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml.bak
 sudo netplan apply
 ```
 
-
-Verify that only the static IP remains:
+Re-verify:
 
 ```
 ip a show enp0s3
 ```
-
 
 Test connectivity:
 
@@ -77,38 +63,32 @@ ping 192.168.0.1
 ping -c 3 google.com
 ```
 
-2️⃣ Hostname Configuration
+## 2. Hostname Configuration
 
-Purpose: Set a proper server hostname for identification in the network and for services like SSH.
-
-Check current hostname:
+Check the current hostname:
 
 ```
 hostnamectl
 ```
 
-
-Change the hostname:
+Set the new hostname:
 
 ```
 sudo hostnamectl set-hostname ubuntu-labtest
 ```
 
-
-Update /etc/hosts to avoid issues with local services:
+Edit `/etc/hosts` for local resolution:
 
 ```
 sudo nano /etc/hosts
 ```
 
-
-Add the following:
+Ensure these entries are present:
 
 ```
 127.0.0.1   localhost
 127.0.1.1   ubuntu-labtest
 ```
-
 
 Verify:
 
@@ -117,82 +97,66 @@ hostname
 hostnamectl
 ```
 
-3️⃣ DNS Configuration
+## 3. DNS Configuration
 
-Purpose: Ensure proper name resolution for external domains.
-
-Already configured in Netplan during static IP setup:
-
-```
-nameservers:
-  addresses: [8.8.8.8, 8.8.4.4]
-  ```
-
-
-Verify DNS resolution:
+DNS is configured in the Netplan file under `nameservers`. Verify resolution:
 
 ```
 ping google.com
 systemd-resolve --status
 ```
 
-4️⃣ SSH Configuration
+## 4. SSH Configuration
 
-Purpose: Enable remote administration of the server.
+Update packages:
+
+```
+sudo apt update
+```
 
 Install OpenSSH server:
 
 ```
-sudo apt update
 sudo apt install openssh-server -y
 ```
 
-
-Start and verify SSH:
+Start the service:
 
 ```
 sudo systemctl start ssh
+```
+
+Check status:
+
+```
 sudo systemctl status ssh
 ```
 
-
-Enable SSH to start on boot:
+Enable on boot:
 
 ```
 sudo systemctl enable ssh
 ```
 
-
-Verify listening port:
+Confirm port 22 is listening:
 
 ```
 sudo ss -tuln | grep 22
 ```
 
-
-Output shows SSH listening on all IPv4 and IPv6 interfaces.
-
-Test connection from another machine:
+Test from a remote machine:
 
 ```
 ssh rooty@192.168.0.150
 ```
 
+Accept the host key and authenticate with the password. The prompt should appear as `rooty@ubuntu-labtest:~$`.
 
-Accept the host key (yes) and enter the password.
+## Summary
 
-Successful connection shows prompt: rooty@ubuntu-labtest:~$.
+- Static IP configured and verified, with Cloud-Init conflict resolved.
+- Hostname updated and `/etc/hosts` adjusted.
+- DNS resolution functional.
+- SSH installed, enabled, and remotely accessible.
 
-5️⃣ Summary
-
-Static IP configured and verified ✅
-
-Hostname set and /etc/hosts updated ✅
-
-DNS working correctly ✅
-
-SSH installed, enabled, and tested remotely ✅
-
-Problem with secondary dynamic IP resolved ✅
-
-This completes the basic installation and configuration of Ubuntu Server.
+This establishes core server networking and access.

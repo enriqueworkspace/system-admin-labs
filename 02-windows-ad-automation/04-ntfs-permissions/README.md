@@ -1,267 +1,107 @@
-NTFS Permissions and Shared Folders Lab
+# NTFS Permissions and Shared Folders Configuration
 
-Objective
+This lab establishes secure folder access on Windows Server using Active Directory groups for departmental isolation. It creates groups in OUs, sets NTFS Modify permissions, configures SMB shares with Full Access per group, and verifies configurations to enforce read/write/delete rights within designated folders only.
 
+## 1. Create Active Directory Groups
+Define global groups in respective OUs for user assignment:
 
-
-Configure NTFS permissions for folders.
-
-
-
-Create shared folders.
-
-
-
-Assign specific access per group.
-
-
-
-Demonstrate mastery of access control.
-
-
-
-This lab demonstrates how to securely organize folder access in a Windows Server environment using Active Directory groups, NTFS permissions, and network shares. Each group has access only to its designated folder.
-
-
-
-Step 1: Create Active Directory Groups
-
-
-
-Each group represents a department or role in the organization. They will control access to their respective folders.
-
-
-
-HR\_Group
-
+HR Group:
 ```
-
 New-ADGroup -Name "HR_Group" -SamAccountName "HR_Group" -GroupScope Global -Path "OU=HR,DC=corp,DC=local"
-
 ```
 
-
-
-IT\_Group
-
+IT Group:
 ```
-
 New-ADGroup -Name "IT_Group" -SamAccountName "IT_Group" -GroupScope Global -Path "OU=IT,DC=corp,DC=local"
-
 ```
 
-
-
-Finance\_Group
-
+Finance Group:
 ```
-
 New-ADGroup -Name "Finance_Group" -SamAccountName "Finance_Group" -GroupScope Global -Path "OU=HR,DC=corp,DC=local"
-
 ```
+Global scope enables domain-wide user inclusion; OU placement maintains organization.
 
-
-
--GroupScope Global allows the group to contain users from the domain.
-
-
-
-Each group is placed in its department OU to keep Active Directory organized.
-
-
-
-Step 2: Create Folders
-
-
-
-Create a folder for each group in C:\\NTFS-Lab. Each folder will store department-specific data.
-
+## 2. Create Folders
+Establish department directories:
 ```
-
 New-Item -Path "C:\NTFS-Lab\HR" -ItemType Directory -Force
-
 New-Item -Path "C:\NTFS-Lab\IT" -ItemType Directory -Force
-
 New-Item -Path "C:\NTFS-Lab\Finance" -ItemType Directory -Force
-
 ```
+`-Force` overwrites if existing.
 
+## 3. Assign NTFS Permissions
+Grant Modify access (read/write/delete) to each group's folder, inheriting to subitems:
 
-
--Force ensures the command succeeds even if the folder already exists.
-
-
-
-Step 3: Assign NTFS Permissions
-
-
-
-NTFS permissions determine who can access files and folders on the server. We assign Modify rights to each group, allowing them to read, write, and delete files within their folder, while preventing other groups from accessing it.
-
-
-
-HR Folder Permissions
-
+HR Folder:
 ```
-
 $folder = "C:\NTFS-Lab\HR"
-
 $acl = Get-Acl $folder
-
 $rule = New-Object System.Security.AccessControl.FileSystemAccessRule("HR_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
-
 $acl.SetAccessRule($rule)
-
 Set-Acl -Path $folder -AclObject $acl
-
 ```
 
-
-
-IT Folder Permissions
-
+IT Folder:
 ```
-
 $folder = "C:\NTFS-Lab\IT"
-
 $acl = Get-Acl $folder
-
 $rule = New-Object System.Security.AccessControl.FileSystemAccessRule("IT_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
-
 $acl.SetAccessRule($rule)
-
 Set-Acl -Path $folder -AclObject $acl
-
 ```
 
-
-
-Finance Folder Permissions
-
+Finance Folder:
 ```
-
 $folder = "C:\NTFS-Lab\Finance"
-
 $acl = Get-Acl $folder
-
 $rule = New-Object System.Security.AccessControl.FileSystemAccessRule("Finance_Group", "Modify", "ContainerInherit,ObjectInherit", "None", "Allow")
-
 $acl.SetAccessRule($rule)
-
 Set-Acl -Path $folder -AclObject $acl
-
 ```
+Inheritance applies to files/subfolders; SYSTEM/Administrators retain full control; others denied.
 
-
-
-ContainerInherit,ObjectInherit ensures permissions apply to all files and subfolders.
-
-
-
-SYSTEM and Administrators retain full control by default.
-
-
-
-Other users (not in the group) have no write access, maintaining security.
-
-
-
-Step 4: Share Folders
-
-
-
-Network shares allow users to access folders over the network. Each folder is shared with Full Access for the corresponding group only.
-
+## 4. Share Folders
+Create SMB shares with group-specific Full Access:
 ```
-
 New-SmbShare -Name "HR_Group" -Path "C:\NTFS-Lab\HR" -FullAccess "HR_Group"
-
 New-SmbShare -Name "IT_Group" -Path "C:\NTFS-Lab\IT" -FullAccess "IT_Group"
-
 New-SmbShare -Name "Finance_Group" -Path "C:\NTFS-Lab\Finance" -FullAccess "Finance_Group"
-
 ```
+Restricts network access to group members.
 
+## 5. Verify Access Control
+Inspect NTFS and share configurations:
 
-
-Only members of the specific group can access their folder through the network share.
-
-
-
-Other groups or users cannot access folders outside their permissions.
-
-
-
-Step 5: Verify Access Control
-
-
-
-Even without active users, we can verify permissions and shares using PowerShell. This ensures the configuration is correct.
-
-
-
-NTFS Permissions Verification
-
+NTFS Verification:
 ```
-
 Get-Acl "C:\NTFS-Lab\HR" | Format-List
-
 Get-Acl "C:\NTFS-Lab\IT" | Format-List
-
 Get-Acl "C:\NTFS-Lab\Finance" | Format-List
-
 ```
+Expected: Modify for respective groups; full for SYSTEM/Administrators; no extraneous access.
 
-
-
-Confirms each group has Modify access to its folder.
-
-
-
-Confirms SYSTEM and Administrators retain full control.
-
-
-
-Confirms other users do not have unnecessary access.
-
-
-
-Share Permissions Verification
-
+Share Verification:
 ```
-
 Get-SmbShare
-
 Get-SmbShareAccess -Name "HR_Group"
-
 Get-SmbShareAccess -Name "IT_Group"
-
 Get-SmbShareAccess -Name "Finance_Group"
-
 ```
-
-
-
-Confirms each share exists.
-
-
-
-Confirms each group has Full Access to its share.
-
-
-
-Confirms no other users or groups have access to these shares.
+Expected: Shares listed; Full Access per group only.
 
 ![HR Folder NTFS Permissions](screenshots/01_HR_NTFS.png)
-
 ![IT Folder NTFS Permissions](screenshots/02_IT_NTFS.png)
-
 ![Finance Folder NTFS Permissions](screenshots/03_Finance_NTFS.png)
-
 ![SMB Shares](screenshots/04_SMB_Shares.png)
-
 ![HR Share Access](screenshots/05_HR_ShareAccess.png)
-
 ![IT Share Access](screenshots/06_IT_ShareAccess.png)
-
 ![Finance Share Access](screenshots/07_Finance_ShareAccess.png)
+
+## Summary
+- Groups (HR_Group, IT_Group, Finance_Group) created in OUs.
+- Folders established with NTFS Modify permissions inherited per group.
+- SMB shares configured for network access limited to group members.
+- Verifications confirm isolation and required rights.
+
+This setup demonstrates granular access control for departmental data security.

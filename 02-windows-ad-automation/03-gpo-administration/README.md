@@ -1,320 +1,113 @@
-GPO Administration Lab
+# GPO Administration Lab
 
-Objectives
+This lab configures and manages Group Policy Objects (GPOs) on Windows Server 2022 to enforce drive mappings, Control Panel restrictions, wallpapers, and security settings. GPOs are linked to existing OUs (IT, HR, Automation) and verified for application using PowerShell and Group Policy Management Console (GPMC).
 
+## 1. Plan GPOs
+Three GPOs are defined:
+- **GPO-DriveMapping**: Maps network drives for users in IT and HR OUs.
+- **GPO-BlockControlPanel**: Prohibits Control Panel access domain-wide.
+- **GPO-WallpaperSecurity**: Applies desktop wallpaper and security configurations for Automation OU users.
 
+This leverages existing OUs and employs descriptive naming for maintainability.
 
-Create and manage Group Policy Objects (GPOs) to:
-
-
-
-Map network drives for users
-
-
-
-Block access to Control Panel
-
-
-
-Set wallpapers and apply security/configuration settings
-
-
-
-Link GPOs to specific Organizational Units (OUs)
-
-
-
-Verify GPO application for users and computers
-
-
-
-Document all steps and commands for reproducibility
-
-
-
-Environment
-
-
-
-Windows Server 2022 with GUI in VirtualBox
-
-
-
-Domain: corp.local
-
-
-
-Existing OUs: IT, HR, Automation
-
-
-
-Users exist in these OUs
-
-
-
-All commands executed in elevated PowerShell and GPMC
-
-
-
-Step 1: Plan GPOs
-
-
-
-Three GPOs were implemented:
-
-
-
-GPO-DriveMapping – Maps network drives for IT and HR users.
-
-
-
-GPO-BlockControlPanel – Restricts access to Control Panel.
-
-
-
-GPO-WallpaperSecurity – Sets wallpaper and applies security/configuration settings for Automation users.
-
-
-
-Rationale:
-
-
-
-Using existing OUs avoids unnecessary creation.
-
-
-
-GPO names follow a clear naming convention.
-
-
-
-Step 2: Create GPOs
-
+## 2. Create GPOs
+Load the GroupPolicy module and generate GPOs:
 ```
-
 Import-Module GroupPolicy
-
-
-
 New-GPO -Name "GPO-DriveMapping" -Comment "Maps network drives for IT and HR users"
-
 New-GPO -Name "GPO-BlockControlPanel" -Comment "Blocks access to Control Panel for users"
-
 New-GPO -Name "GPO-WallpaperSecurity" -Comment "Sets wallpaper and security settings for Automation users"
+```
 
-
-
-\# Verify creation
-
+Verify:
+```
 Get-GPO -All | Select-Object DisplayName, Id, CreationTime
-
 ```
+Expected: All three GPOs listed with creation timestamps.
 
-
-
-Purpose:
-
-
-
-Creates each GPO in the domain.
-
-
-
-Verification ensures they exist before linking.
-
-
-
-Step 3: Link GPOs to OUs
-
+## 3. Link GPOs to OUs
+Link GPO-BlockControlPanel to all OUs:
 ```
-
-# Link BlockControlPanel GPO to multiple OUs
-
 $ous = @(
-
-&nbsp;   "OU=IT,DC=corp,DC=local",
-
-&nbsp;   "OU=HR,DC=corp,DC=local",
-
-&nbsp;   "OU=Automation,DC=corp,DC=local"
-
+    "OU=IT,DC=corp,DC=local",
+    "OU=HR,DC=corp,DC=local",
+    "OU=Automation,DC=corp,DC=local"
 )
-
 foreach ($ou in $ous) {
-
-&nbsp;   New-GPLink -Name "GPO-BlockControlPanel" -Target $ou
-
+    New-GPLink -Name "GPO-BlockControlPanel" -Target $ou
 }
+```
 
-
-
-# Link DriveMapping GPO
-
+Link GPO-DriveMapping:
+```
 New-GPLink -Name "GPO-DriveMapping" -Target "OU=IT,DC=corp,DC=local"
-
 New-GPLink -Name "GPO-DriveMapping" -Target "OU=HR,DC=corp,DC=local"
+```
 
-
-
-# Link WallpaperSecurity GPO
-
+Link GPO-WallpaperSecurity:
+```
 New-GPLink -Name "GPO-WallpaperSecurity" -Target "OU=Automation,DC=corp,DC=local"
+```
 
-
-
-# Verify linked GPOs
-
+Verify inheritance:
+```
 Get-GPInheritance -Target "OU=IT,DC=corp,DC=local" | Select-Object GpoName, Enforced
-
 Get-GPInheritance -Target "OU=HR,DC=corp,DC=local" | Select-Object GpoName, Enforced
-
 Get-GPInheritance -Target "OU=Automation,DC=corp,DC=local" | Select-Object GpoName, Enforced
-
 ```
+Expected: Linked GPOs displayed per OU, without enforcement overrides.
 
+## 4. Configure GPO Settings
+### 4a. Drive Mapping (GPO-DriveMapping)
+In GPMC: User Configuration → Preferences → Windows Settings → Drive Maps.
+- Action: Create
+- Location: `\\ServerName\ShareName`
+- Drive Letter: Z:
+- Label as: Department Share
+- Reconnect: Enabled
 
+### 4b. Control Panel Restriction (GPO-BlockControlPanel)
+In GPMC: User Configuration → Administrative Templates → Control Panel → Enable "Prohibit access to Control Panel and PC settings".
 
-Purpose:
-
-
-
-Attaches each GPO to the correct OU.
-
-
-
-Looping avoids repeating commands manually.
-
-
-
-Get-GPInheritance confirms successful linking.
-
-
-
-Step 4: Configure GPO Settings
-
-4a. Drive Mapping (GPO-DriveMapping)
-
-
-
-User Configuration → Preferences → Windows Settings → Drive Maps
-
-
-
-Create a mapped drive:
-
-
-
-Action: Create
-
-
-
-Location: \\\\ServerName\\ShareName
-
-
-
-Drive Letter: Z:
-
-
-
-Label as: Department Share
-
-
-
-Reconnect: Checked
-
-
-
-4b. Control Panel Restriction (GPO-BlockControlPanel)
-
-
-
-User Configuration → Administrative Templates → Control Panel
-
-
-
-Enable Prohibit access to Control Panel and PC settings
-
-
-
-Optional PowerShell:
-
+PowerShell alternative:
 ```
-
 Set-GPRegistryValue -Name "GPO-BlockControlPanel" -Key "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" -ValueName "NoControlPanel" -Type DWord -Value 1
-
 ```
 
-4c. Wallpaper and Security (GPO-WallpaperSecurity)
+### 4c. Wallpaper and Security (GPO-WallpaperSecurity)
+In GPMC: User Configuration → Administrative Templates → Desktop → Desktop → Desktop Wallpaper → Configure path (if image available).
 
+Additional: Computer Configuration → Windows Settings → Security Settings for policies like account lockout or auditing.
 
-
-User Configuration → Administrative Templates → Desktop → Desktop → Desktop Wallpaper
-
-
-
-Configure wallpaper path if available
-
-
-
-Additional security settings applied under Computer Configuration → Windows Settings → Security Settings
-
-
-
-Step 5: Force GPO Update and Verify
-
+## 5. Force GPO Update and Verify
+Refresh policies:
 ```
-
-# Force immediate refresh
-
 gpupdate /force
-
-
-
-# Check applied GPOs for user
-
-gpresult /r
-
-
-
-# Verify linked GPOs for OU
-
-Get-GPInheritance -Target "OU=IT,DC=corp,DC=local"
-
 ```
 
+Check applied GPOs:
+```
+gpresult /r
+```
+Expected: Target GPOs listed under "Applied Group Policy Objects".
 
+Review OU inheritance:
+```
+Get-GPInheritance -Target "OU=IT,DC=corp,DC=local"
+```
 
-Purpose:
+Policies apply to domain-joined machines and users in linked OUs.
 
+## 6. Verification Commands
+- List all GPOs: `Get-GPO -All`
+- View OU-linked GPOs: `Get-GPInheritance -Target <OU>`
+- Refresh policies: `gpupdate /force`
+- Report applied GPOs: `gpresult /r`
 
+## Summary
+- GPOs created: GPO-DriveMapping, GPO-BlockControlPanel, GPO-WallpaperSecurity.
+- Linked to IT, HR, and Automation OUs as required.
+- Settings configured for drive mapping, restrictions, and security.
+- Application verified via refresh and reporting commands.
 
-Ensures GPOs are applied to users and computers.
-
-
-
-Confirms functionality: drive mappings, Control Panel restriction, wallpaper, and security settings.
-
-
-
-Note: Policies only apply on domain-joined machines and users in linked OUs.
-
-
-
-Step 6: Verification Commands
-
-
-
-Get-GPO -All → Lists all GPOs in the domain
-
-
-
-Get-GPInheritance -Target <OU> → Shows GPOs linked to a specific OU
-
-
-
-gpupdate /force → Refreshes policies immediately
-
-
-
-gpresult /r → Confirms applied GPOs for a user
-
+This establishes centralized policy enforcement for domain management.
