@@ -1,0 +1,47 @@
+---
+- name: Install and configure web servers (Nginx on Linux, IIS on Windows)
+  hosts: all
+  gather_facts: yes
+  become: false
+
+  tasks:
+    - name: Linux - Install and configure Nginx
+      block:
+        - name: Update apt cache and install Nginx
+          apt:
+            name: nginx
+            state: present
+            update_cache: yes
+
+        - name: Ensure Nginx is started and enabled
+          service:
+            name: nginx
+            state: started
+            enabled: yes
+      become: true
+      when: ansible_os_family == "Debian"
+
+    - name: Windows - Install IIS with default features
+      block:
+        - name: Install IIS Web Server role + management tools
+          win_feature:
+            name:
+              - Web-Server
+              - Web-Common-Http
+              - Web-Static-Content
+              - Web-Default-Doc
+              - Web-Dir-Browsing
+              - Web-Http-Errors
+              - Web-Health
+              - Web-Performance
+              - Web-Mgmt-Tools
+              - Web-Mgmt-Console
+            state: present
+            restart: yes
+
+        - name: Ensure IIS service is running
+          win_service:
+            name: W3SVC
+            state: started
+            start_mode: auto
+      when: ansible_os_family == "Windows"
