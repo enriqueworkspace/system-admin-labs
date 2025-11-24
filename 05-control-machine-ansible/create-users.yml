@@ -1,18 +1,18 @@
 ---
-- name: Crear usuarios y grupos en Linux y Windows
+- name: Create users and groups on Linux and Windows
   hosts: all
   gather_facts: yes
-  become: false          # ← DESACTIVADO GLOBALMENTE
+  become: false                     # Disabled globally (Windows doesn't support become)
 
   tasks:
-    - name: Linux - Crear grupo, usuario y sudo sin password
+    - name: Linux - Create group, user and passwordless sudo
       block:
-        - name: Crear grupo admins
+        - name: Ensure group 'admins' exists
           group:
             name: admins
             state: present
 
-        - name: Crear usuario labuser (Linux)
+        - name: Create user 'labuser' (Linux)
           user:
             name: labuser
             password: "{{ 'Lab2025!' | password_hash('sha512') }}"
@@ -22,18 +22,18 @@
             create_home: yes
             state: present
 
-        - name: labuser sudo sin contraseña
+        - name: Grant passwordless sudo to labuser
           lineinfile:
             path: /etc/sudoers.d/labuser
             line: "labuser ALL=(ALL) NOPASSWD: ALL"
             create: yes
-            mode: 0440
+            mode: "0440"
             validate: visudo -cf %s
       become: true
       become_method: sudo
       when: ansible_os_family == "Debian"
 
-    - name: Windows - Crear usuario labuser
+    - name: Windows - Create local administrator 'labuser'
       win_user:
         name: labuser
         password: Lab2025!
