@@ -1,0 +1,94 @@
+---
+- name: Apply firewall rules and basic hardening (Linux + Windows)
+  hosts: all
+  gather_facts: yes
+  become: false
+
+  tasks:
+    # ======================= LINUX HARDENING =======================
+    - name: Linux - Firewall (UFW) → allow only SSH + HTTP/HTTPS
+      block:
+        - name: Install UFW if not present
+          apt:
+            name: ufw
+            state: present
+          become: yes
+
+        - name: Allow SSH (port 22)
+          ufw:
+            rule: allow
+            port: 22
+            proto: tcp
+          become: yes
+
+        - name: Allow HTTP/HTTPS
+          ufw:
+            rule: allow
+            port: "{{ item }}"
+            proto: tcp
+          loop:
+            - 80
+            - 443
+          become: yes
+
+        - name: Deny all other incoming traffic
+          ufw:
+            policy: deny
+            direction: incoming
+          become: yes
+
+        - name: Enable UFW
+          ufw:
+            state: enabled
+          become: yes
+
+        - name: Disable root login via SSH
+          lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '^PermitRootLogin'
+            line: 'PermitRootLogin no'
+          become: yes
+          notify: Restart SSH
+
+      when: ansible_os_family == "Debian"
+
+    # ======================= WINDOWS HARDENING =======================
+    - name: Windows - Firewall → allow only HTTP/HTTPS + WinRM
+      block:
+        - name: Allow HTTP (80)
+          win_firewall_rule:
+            name: "Allow HTTP"
+            localport: 80
+            action: allow
+            direction: in
+            protocol: tcp
+            state: present
+            enabled: yes
+
+        - name: Allow HTTPS (443)
+          win_firewall_rule:
+            name: "Allow HTTPS"
+            localport: 443
+            action: allow
+            direction: in
+            protocol: tcp
+            state: present
+            enabled: yes
+
+        - name: Allow WinRM (5986)
+          win_firewall_rule:
+            name: "Allow WinRM HTTPS"
+            localport: 5986
+            action: allow
+            direction: in
+            protocol: tcp
+            state: present
+            enabled: yes
+      when: ansible_os_family == "Windows"
+
+  handlers:
+    - name: Restart SSH
+      service:
+        name: ssh
+        state: restarted
+      become: yes
