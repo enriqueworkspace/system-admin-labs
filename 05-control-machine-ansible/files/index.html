@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lab 05 - Ansible Multi-Platform Success</title>
+  <style>
+    body {font-family: Arial, sans-serif; text-align: center; margin-top: 100px; background: #f0f0f0;}
+    h1 {color: #0066cc; font-size: 3em;}
+    .info {font-size: 1.3em; margin: 20px; color: #333;}
+    .footer {margin-top: 50px; color: #666; font-size: 0.9em;}
+  </style>
+</head>
+<body>
+  <h1>SUCCESS!</h1>
+  <p class="info">This page was automatically deployed by Ansible</p>
+  <p class="info">Hostname: <strong>{{ ansible_hostname }}</strong></p>
+  <p class="info">OS: <strong>{{ ansible_system }} {{ ansible_distribution }} {{ ansible_distribution_version }}</strong></p>
+  <p class="info">Connected as: <strong>{{ ansible_user }}</strong></p>
+  <p class="footer">Lab 05 completed on {{ ansible_date_time.date }} at {{ ansible_date_time.time }}</p>
+</body>
+</html>
