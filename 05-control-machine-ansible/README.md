@@ -46,8 +46,8 @@ ansible-playbook web-servers.yml --ask-vault-pass
 ansible-playbook deploy-html.yml --ask-vault-pass
 ```
 Verification:  
-http://192.168.x.xxx → Ubuntu + Nginx  
-http://192.168.x.xxx → Windows Server 2022 + IIS
+http://192.168.0.163 → Ubuntu + Nginx  
+http://192.168.0.113 → Windows Server 2022 + IIS
 
 ![04-html-deployed-both-servers.png](screenshots/04-html-deployed-both-servers.png)
 
@@ -55,6 +55,8 @@ http://192.168.x.xxx → Windows Server 2022 + IIS
 ```bash
 ansible-playbook firewall-hardening.yml --ask-vault-pass
 ```
+→ Only ports 22, 80, 443, 5986 allowed
+→ Root SSH login disabled
 
 ## Security Best Practices Applied
 - All credentials stored in encrypted Ansible Vault
@@ -81,3 +83,4 @@ ansible-playbook firewall-hardening.yml --ask-vault-pass
 100 % idempotent  
 100 % secure  
 100 % documented with real execution screenshots
+
