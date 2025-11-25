@@ -1,4 +1,3 @@
-```markdown
 # Ansible Multi-Platform Automation (Linux + Windows)
 
 Fully idempotent Ansible control of heterogeneous environments:
@@ -20,10 +19,11 @@ All secrets protected with encrypted Ansible Vault.
 ## Execution Order & Proof
 
 ### 1. Connectivity Test – ping/pong success on both platforms
-```bash
+```
 ansible -i inventory.yml linux -m ping
 ansible -i inventory.yml windows -m win_ping
 ```
+
 ![01-ping-pong-success.png](screenshots/01-ping-pong-success-linux-and-windows.png)
 
 ### 2. User & Group Creation
@@ -56,6 +56,7 @@ http://192.168.0.113 → Windows Server 2022 + IIS
 ansible-playbook firewall-hardening.yml --ask-vault-pass
 ```
 → Only ports 22, 80, 443, 5986 allowed
+
 → Root SSH login disabled
 
 ## Security Best Practices Applied
@@ -83,4 +84,5 @@ ansible-playbook firewall-hardening.yml --ask-vault-pass
 100 % idempotent  
 100 % secure  
 100 % documented with real execution screenshots
+
 
